@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="sq" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farmaci Orien</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;1,700&family=Inter:wght@300;400;500;600&display=swap');
+    :root {
+      --primary: #2F4F73; --primary-light: #3d6491; --primary-dark: #1e3349;
+      --accent: #C5302E; --accent-light: #e04442;
+      --success: #22c55e; --warning: #f59e0b;
+      --bg: #f7f9fc; --bg-card: #ffffff; --bg-header: #2F4F73; --bg-footer: #1a2a3a;
+      --text-primary: #1a202c; --text-secondary: #4a5568; --text-muted: #718096;
+      --border: #e2e8f0; --border-focus: #2F4F73;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.13); --shadow-xl: 0 16px 48px rgba(0,0,0,0.16);
+      --radius-sm: 6px; --radius-md: 12px; --radius-lg: 18px; --radius-xl: 24px;
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1); --header-h: 68px;
+      --neon: rgba(80,160,255,0.55); --neon-soft: rgba(80,160,255,0.18);
+      --menu-drawer-bg: #2F4F73;
+    }
+    [data-theme="dark"] {
+      --bg: #0f1923; --bg-card: #1a2535; --bg-header: #111d2b;
+      --text-primary: #f0f4f8; --text-secondary: #a0aec0; --text-muted: #718096;
+      --border: #2d3f52; --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4); --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+      --menu-drawer-bg: #0f1923;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: 'Inter','Nunito',sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; transition: background var(--transition), color var(--transition); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    input, textarea { font-family: inherit; }
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 10px; }
+    h1,h2,h3,h4 { font-family: 'Montserrat',sans-serif; font-weight: 700; line-height: 1.2; }
+
+    /* AMBIENT BG */
+    #bg-ambient-light { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+    .orb-1 { width:600px; height:600px; background: radial-gradient(circle,rgba(47,79,115,0.09) 0%,transparent 70%); top:-150px; left:-100px; animation: orbFloat1 18s ease-in-out infinite; }
+    .orb-2 { width:500px; height:500px; background: radial-gradient(circle,rgba(80,130,200,0.07) 0%,transparent 70%); bottom:-120px; right:-80px; animation: orbFloat2 22s ease-in-out infinite; }
+    @keyframes orbFloat1 { 0%{transform:translate(0,0) scale(1)} 25%{transform:translate(80px,40px) scale(1.05)} 50%{transform:translate(30px,100px) scale(0.97)} 75%{transform:translate(-40px,60px) scale(1.03)} 100%{transform:translate(0,0) scale(1)} }
+    @keyframes orbFloat2 { 0%{transform:translate(0,0) scale(1)} 30%{transform:translate(-60px,-80px) scale(1.08)} 60%{transform:translate(40px,-40px) scale(0.95)} 100%{transform:translate(0,0) scale(1)} }
+    [data-theme="dark"] .orb-1 { background: radial-gradient(circle,rgba(47,100,180,0.12) 0%,transparent 70%); }
+    [data-theme="dark"] .orb-2 { background: radial-gradient(circle,rgba(60,120,200,0.10) 0%,transparent 70%); }
+
+    /* Z-INDEX */
+    #site-header { z-index: 1200; }
+    #menu-overlay { z-index: 900; }
+    #menu-drawer { z-index: 910; }
+    .cart-overlay { z-index: 1200; }
+    .cart-drawer { z-index: 1300; }
+    .modal-overlay { z-index: 1500; }
+    .settings-overlay { z-index: 1200; }
+    .settings-panel { z-index: 1300; }
+    .success-popup { z-index: 2000; }
+    .toast { z-index: 2000; }
+    .auth-modal-overlay { z-index: 2100; }
+    #cursor-glow { z-index: 9999; }
+
+    /* CURSOR GLOW */
+    #cursor-glow { position: fixed; width:320px; height:320px; border-radius:50%; pointer-events:none; transform:translate(-50%,-50%); background: radial-gradient(circle,rgba(80,160,255,0.055) 0%,rgba(80,160,255,0.022) 40%,transparent 70%); transition: opacity 0.3s ease; mix-blend-mode: screen; }
+    [data-theme="dark"] #cursor-glow { background: radial-gradient(circle,rgba(80,160,255,0.08) 0%,rgba(80,160,255,0.03) 40%,transparent 70%); }
+
+    /* LOGO */
+    .logo-orien { font-family:'Nunito',sans-serif; font-weight:800; font-size:2rem; color:#C5302E; font-style:italic; letter-spacing:1px; text-shadow:0 0 20px rgba(197,48,46,0.45),0 0 40px rgba(197,48,46,0.2),0 2px 12px rgba(0,0,0,0.3); filter: drop-shadow(0 0 8px rgba(197,48,46,0.35)); line-height:1; user-select:none; display:inline-block; }
+    .menu-logo-orien { font-family:'Nunito',sans-serif; font-weight:800; font-size:1.5rem; color:#e05c5a; font-style:italic; letter-spacing:1px; line-height:1; user-select:none; }
+    .footer-logo-orien { font-family:'Nunito',sans-serif; font-weight:800; font-size:2rem; color:#e05c5a; font-style:italic; letter-spacing:1px; line-height:1; display:block; margin-bottom:12px; user-select:none; }
+
+    /* HEADER */
+    #site-header { position: sticky; top:0; z-index:1200; background: #2F4F73 !important; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow-sm); height: var(--header-h); }
+    .header-inner { max-width:1280px; margin:0 auto; padding:0 20px; height:100%; display:flex; align-items:center; gap:12px; position:relative; }
+    .header-logo { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .header-actions { display:flex; align-items:center; gap:4px; margin-left:6px; flex-shrink:0; }
+    .icon-btn { width:36px; height:36px; border-radius:8px; border:none; background:none; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.65); transition:color 0.2s,background 0.2s; position:relative; }
+    .icon-btn:hover { color:rgba(255,255,255,0.95); background:rgba(255,255,255,0.08); }
+    .cart-badge { position:absolute; top:3px; right:3px; background:var(--accent); color:white; font-size:0.62rem; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1.5px solid #2F4F73; }
+    .cart-badge.bump { animation: cartBump 0.3s ease; }
+    @keyframes cartBump { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+
+    /* EXPANDABLE SEARCH */
+    .header-search-expandable { position:relative; display:flex; align-items:center; }
+    .search-toggle-btn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:rgba(255,255,255,0.65); border-radius:8px; cursor:pointer; transition:color 0.2s,background 0.2s; flex-shrink:0; }
+    .search-toggle-btn:hover { color:rgba(255,255,255,0.95); background:rgba(255,255,255,0.08); }
+    .search-toggle-btn.open { color:#fff; background:rgba(255,255,255,0.12); }
+    .header-search-expandable .search-expand-wrap { position:absolute; right:0; top:50%; transform:translateY(-50%); width:0; overflow:hidden; transition:width 0.3s cubic-bezier(0.4,0,0.2,1); pointer-events:none; z-index:10; }
+    .header-search-expandable .search-expand-wrap.open { width:300px; pointer-events:all; }
+    .search-expand-inner { width:300px; padding-right:40px; position:relative; }
+    .search-expand-inner input { width:100%; padding:9px 16px 9px 38px; border:1.5px solid rgba(255,255,255,0.25); border-radius:50px; background:rgba(255,255,255,0.12); color:#fff; font-size:0.9rem; outline:none; transition:border 0.2s,box-shadow 0.2s,background 0.2s; font-family:'Inter',sans-serif; }
+    .search-expand-inner input:focus { border-color:rgba(255,255,255,0.5); box-shadow:0 0 0 3px rgba(255,255,255,0.1); background:rgba(255,255,255,0.18); }
+    .search-expand-inner input::placeholder { color:rgba(255,255,255,0.5); }
+    .search-expand-inner .search-icon-inner { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.5); pointer-events:none; }
+    .header-search-expandable .search-results-dropdown { position:absolute; top:calc(100% + 10px); right:0; width:320px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:1000; max-height:360px; overflow-y:auto; display:none; }
+    .header-search-expandable .search-results-dropdown.active { display:block; animation:fadeDown 0.18s ease; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .search-result-item { display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer; transition:background var(--transition); border-bottom:1px solid var(--border); }
+    .search-result-item:last-child { border-bottom:none; }
+    .search-result-item:hover { background:var(--bg); }
+    .search-result-img { width:42px; height:42px; border-radius:8px; object-fit:cover; flex-shrink:0; background:var(--border); }
+    .search-result-info .name { font-weight:600; font-size:0.9rem; color:var(--text-primary); }
+    .search-result-info .price { font-size:0.82rem; color:var(--accent); font-weight:700; }
+    .search-no-result { padding:16px; text-align:center; color:var(--text-muted); font-size:0.9rem; }
+
+    /* USER AVATAR */
+    .user-avatar-btn { width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.35); background:linear-gradient(135deg,#3d6491,#2F4F73); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.75rem; font-weight:700; cursor:pointer; transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s; font-family:'Nunito',sans-serif; overflow:hidden; flex-shrink:0; letter-spacing:0.5px; }
+    .user-avatar-btn:hover { border-color:rgba(255,255,255,0.7); box-shadow:0 0 12px rgba(80,160,255,0.35); transform:scale(1.07); }
+    .user-avatar-btn.logged-in { border-color:#22c55e; box-shadow:0 0 8px rgba(34,197,94,0.35); }
+    .user-dropdown-wrap { position:relative; }
+    .user-dropdown { position:absolute; top:calc(100% + 10px); right:0; min-width:200px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-lg); z-index:1400; display:none; overflow:hidden; animation:fadeDown 0.18s ease; }
+    .user-dropdown.open { display:block; }
+    .user-dropdown-header { padding:14px 16px 10px; border-bottom:1px solid var(--border); }
+    .user-dropdown-name { font-weight:700; font-size:0.9rem; color:var(--text-primary); }
+    .user-dropdown-email { font-size:0.75rem; color:var(--text-muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:170px; }
+    .user-dropdown-item { display:flex; align-items:center; gap:10px; padding:11px 16px; font-size:0.88rem; color:var(--text-secondary); cursor:pointer; transition:background 0.15s; border:none; background:none; width:100%; text-align:left; font-family:'Inter',sans-serif; }
+    .user-dropdown-item:hover { background:var(--bg); color:var(--text-primary); }
+    .user-dropdown-item.danger { color:var(--accent); }
+    .user-dropdown-item.danger:hover { background:rgba(197,48,46,0.07); }
+
+    /* ACTIVE CAT CHIP */
+    #active-cat-chip { display:none; align-items:center; gap:8px; padding:8px 16px; background:#1e3349; border-bottom:1px solid rgba(0,0,0,0.12); }
+    #active-cat-chip.visible { display:flex; }
+    #active-cat-chip span { font-size:12px; font-weight:600; color:rgba(255,255,255,0.55); font-family:'Nunito',sans-serif; }
+    #active-cat-chip strong { font-size:13px; color:#fff; font-family:'Nunito',sans-serif; }
+    .chip-clear { margin-left:auto; background:rgba(255,255,255,0.13); border:none; border-radius:6px; color:rgba(255,255,255,0.75); font-size:11px; font-weight:600; padding:3px 8px; cursor:pointer; font-family:'Nunito',sans-serif; transition:background 0.2s; }
+    .chip-clear:hover { background:rgba(255,255,255,0.22); }
+
+    /* HAMBURGER */
+    #hamburger-btn { display:flex !important; flex-direction:column; justify-content:center; align-items:center; gap:5px; width:40px; height:40px; background:none; border:none; cursor:pointer; padding:6px; border-radius:8px; transition:background 0.2s,box-shadow 0.2s; flex-shrink:0; z-index:1300; }
+    #hamburger-btn:hover { background:rgba(255,255,255,0.15); box-shadow:0 0 12px var(--neon); }
+    #hamburger-btn span { display:block; width:20px; height:2px; background:#fff !important; border-radius:2px; transition:transform 0.3s ease,opacity 0.3s ease,width 0.3s ease; transform-origin:center; }
+    #hamburger-btn.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    #hamburger-btn.open span:nth-child(2) { opacity:0; transform:scaleX(0); }
+    #hamburger-btn.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+    #category-bar { display:none !important; }
+
+    /* MAIN */
+    main { max-width:1280px; margin:0 auto; padding:28px 20px 60px; }
+
+    /* SLIDER */
+    .offers-section { margin-bottom:40px; }
+    .offers-section h2 { font-size:1.25rem; color:var(--text-primary); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .offers-section h2 .badge { background:var(--accent); color:white; font-size:0.72rem; padding:2px 9px; border-radius:50px; font-weight:700; letter-spacing:0.5px; }
+    .slider-wrapper { position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); }
+    .slider-track { display:flex; transition:transform 0.55s cubic-bezier(0.4,0,0.2,1); }
+    .slide { min-width:100%; position:relative; border-radius:var(--radius-lg); overflow:hidden; display:flex; align-items:center; min-height:200px; isolation:isolate; }
+    .slide-bg-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:0; transition:transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+    .slide:hover .slide-bg-img { transform:scale(1.04); }
+    .slide-overlay { position:absolute; inset:0; background:linear-gradient(105deg,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.45) 55%,rgba(0,0,0,0.18) 100%); z-index:1; }
+    .slide-content { padding:36px 44px; flex:1; z-index:4; position:relative; }
+    .slide-tag { font-size:0.78rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.85); margin-bottom:10px; text-shadow:0 1px 8px rgba(0,0,0,0.7); }
+    .slide-title { font-size:1.8rem; font-weight:800; color:#fff; font-family:'Montserrat',sans-serif; line-height:1.2; margin-bottom:12px; text-shadow:0 2px 12px rgba(0,0,0,0.8); }
+    .slide-desc { font-size:0.95rem; color:rgba(255,255,255,0.92); max-width:400px; line-height:1.6; text-shadow:0 1px 8px rgba(0,0,0,0.85); }
+    .slider-btn { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.92); border:none; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--primary); z-index:10; box-shadow:var(--shadow-md); transition:all var(--transition); }
+    .slider-btn:hover { background:white; transform:translateY(-50%) scale(1.1); box-shadow:0 0 16px var(--neon),var(--shadow-md); }
+    .slider-btn.prev { left:12px; }
+    .slider-btn.next { right:12px; }
+    .slider-dots { display:flex; justify-content:center; gap:7px; margin-top:12px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--border); border:none; transition:all var(--transition); cursor:pointer; }
+    .dot.active { background:var(--primary); width:22px; border-radius:4px; }
+    .offer-slide-link { cursor:pointer; }
+    .offer-btn { margin-top:18px; padding:8px 16px; background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:700; border-radius:20px; border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(6px); cursor:pointer; transition:all 0.2s ease; }
+    .offer-btn:hover { background:rgba(80,160,255,0.25); border-color:rgba(80,160,255,0.5); box-shadow:0 0 14px var(--neon-soft); }
+
+    /* SECTION TITLE */
+    .section-title { font-size:1.2rem; font-weight:700; color:var(--text-primary); margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+    .section-title::after { content:''; flex:1; height:1.5px; background:var(--border); border-radius:2px; }
+
+    /* PRODUCT GRID */
+    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:18px; }
+    .product-card { background:var(--bg-card); border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; cursor:pointer; transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition); position:relative; display:flex; flex-direction:column; }
+    .product-card:hover { transform:translateY(-5px); box-shadow:0 8px 32px rgba(80,160,255,0.18),0 0 0 1.5px rgba(80,160,255,0.35); border-color:rgba(80,160,255,0.45); }
+    .product-img-wrap { aspect-ratio:1/1; overflow:hidden; background:var(--bg); position:relative; }
+    .product-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease; }
+    .product-card:hover .product-img-wrap img { transform:scale(1.06); }
+    .product-badge { position:absolute; top:10px; left:10px; background:var(--accent); color:white; font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:50px; }
+    .out-of-stock-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.42); display:flex; align-items:center; justify-content:center; font-weight:700; color:white; font-size:0.88rem; }
+    .product-info { padding:14px; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+    .product-name { font-weight:700; font-size:0.93rem; color:var(--text-primary); margin-bottom:6px; line-height:1.3; }
+    .product-cat { font-size:0.75rem; color:var(--text-muted); margin-bottom:8px; }
+    .product-pricing { margin-top:auto; }
+    .product-price { font-size:1.05rem; font-weight:800; color:var(--primary); }
+    .product-price-original { font-size:0.82rem; color:var(--text-muted); text-decoration:line-through; margin-right:6px; }
+    .product-price-discounted { font-size:1.05rem; font-weight:800; color:var(--accent); }
+    .add-to-cart-btn { margin-top:10px; width:100%; padding:9px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-weight:600; font-size:0.85rem; transition:all var(--transition); }
+    .add-to-cart-btn:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 16px rgba(47,79,115,0.4); }
+    .add-to-cart-btn:disabled { background:var(--border); color:var(--text-muted); cursor:not-allowed; transform:none; box-shadow:none; }
+    .skeleton { background:linear-gradient(90deg,var(--border) 25%,var(--bg) 50%,var(--border) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--radius-md); }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-card { height:290px; }
+
+    /* PRODUCT DETAIL */
+    #product-page { display:none; }
+    .product-detail { max-width:900px; margin:0 auto; }
+    .back-btn { display:inline-flex; align-items:center; gap:7px; color:var(--primary); font-weight:600; font-size:0.9rem; margin-bottom:28px; padding:8px 16px; border-radius:var(--radius-sm); border:1.5px solid var(--border); background:var(--bg-card); transition:all var(--transition); }
+    .back-btn:hover { background:var(--primary); color:white; border-color:var(--primary); transform:translateX(-3px); }
+    .product-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:start; }
+    .product-detail-img { border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-lg); aspect-ratio:1; }
+    .product-detail-img img { width:100%; height:100%; object-fit:cover; }
+    .product-detail-info { display:flex; flex-direction:column; gap:14px; }
+    .product-detail-name { font-size:1.6rem; font-weight:800; color:var(--text-primary); }
+    .product-detail-cat { display:inline-block; background:rgba(47,79,115,0.1); color:var(--primary); font-size:0.8rem; font-weight:700; padding:4px 12px; border-radius:50px; }
+    .product-detail-price-wrap { display:flex; align-items:center; gap:12px; }
+    .product-detail-price { font-size:1.8rem; font-weight:800; color:var(--primary); }
+    .product-detail-price.discounted { color:var(--accent); }
+    .product-detail-original { font-size:1.1rem; color:var(--text-muted); text-decoration:line-through; }
+    .product-detail-desc { font-size:0.95rem; color:var(--text-secondary); line-height:1.75; }
+    .product-detail-sasia { font-size:0.9rem; color:var(--text-muted); }
+    .product-detail-add { padding:14px 28px; background:var(--primary); color:white; border:none; border-radius:var(--radius-md); font-size:1rem; font-weight:700; transition:all var(--transition); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .product-detail-add:hover { background:var(--primary-dark); transform:translateY(-2px); box-shadow:0 6px 20px rgba(47,79,115,0.3); }
+
+    /* CART DRAWER */
+    .cart-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1200; opacity:0; pointer-events:none; transition:opacity var(--transition); backdrop-filter:blur(4px); }
+    .cart-overlay.open { opacity:1; pointer-events:all; }
+    .cart-drawer { position:fixed; top:0; right:0; bottom:0; width:400px; max-width:95vw; background:var(--bg-card); z-index:1300; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; box-shadow:var(--shadow-xl); }
+    .cart-drawer.open { transform:translateX(0); }
+    .cart-header { padding:22px 22px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .cart-header h3 { font-size:1.1rem; font-weight:700; }
+    .close-btn { width:36px; height:36px; border-radius:50%; border:1.5px solid var(--border); background:var(--bg); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; transition:all var(--transition); }
+    .close-btn:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .cart-items { flex:1; overflow-y:auto; padding:16px 22px; }
+    .cart-item { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); animation:fadeIn 0.2s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:none} }
+    .cart-item-img { width:54px; height:54px; border-radius:8px; object-fit:cover; flex-shrink:0; background:var(--bg); }
+    .cart-item-info { flex:1; }
+    .cart-item-name { font-weight:600; font-size:0.88rem; color:var(--text-primary); margin-bottom:3px; }
+    .cart-item-price { font-size:0.85rem; color:var(--accent); font-weight:700; }
+    .cart-item-qty { display:flex; align-items:center; gap:8px; }
+    .qty-btn { width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border); background:var(--bg); color:var(--text-primary); font-size:1rem; font-weight:700; display:flex; align-items:center; justify-content:center; transition:all var(--transition); }
+    .qty-btn:hover { background:var(--primary); color:white; border-color:var(--primary); }
+    .qty-num { font-weight:700; font-size:0.9rem; min-width:20px; text-align:center; }
+    .remove-btn { color:var(--accent); font-size:0.78rem; cursor:pointer; margin-left:6px; transition:color var(--transition); }
+    .remove-btn:hover { color:var(--accent-light); }
+    .cart-empty { text-align:center; padding:40px 20px; color:var(--text-muted); }
+    .cart-empty svg { width:56px; height:56px; margin:0 auto 12px; opacity:0.4; }
+    .cart-footer { padding:18px 22px; border-top:1px solid var(--border); }
+    .cart-total { display:flex; justify-content:space-between; font-size:1.05rem; font-weight:700; margin-bottom:14px; }
+    .cart-total span:last-child { color:var(--primary); }
+    .checkout-btn { width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:var(--radius-md); font-size:1rem; font-weight:700; transition:all var(--transition); }
+    .checkout-btn:hover { background:var(--primary-dark); transform:translateY(-2px); box-shadow:0 6px 20px rgba(47,79,115,0.3); }
+
+    /* ORDER MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity var(--transition); backdrop-filter:blur(4px); padding:20px; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal { background:var(--bg-card); border-radius:var(--radius-xl); width:100%; max-width:520px; max-height:90vh; overflow-y:auto; padding:32px; transform:scale(0.95) translateY(20px); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow:var(--shadow-xl); }
+    .modal-overlay.open .modal { transform:scale(1) translateY(0); }
+    .modal h3 { font-size:1.25rem; font-weight:800; margin-bottom:22px; color:var(--text-primary); }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+    .form-group input, .form-group textarea { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); color:var(--text-primary); font-size:0.93rem; outline:none; transition:border var(--transition),box-shadow var(--transition); }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(47,79,115,0.12); background:var(--bg-card); }
+    .form-group input.error { border-color:var(--accent); }
+    .form-error { font-size:0.78rem; color:var(--accent); margin-top:4px; display:none; }
+    .form-error.show { display:block; }
+    .modal-actions { display:flex; gap:10px; margin-top:22px; }
+    .btn-secondary { flex:1; padding:12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); color:var(--text-secondary); font-weight:600; transition:all var(--transition); }
+    .btn-secondary:hover { background:var(--border); }
+    .btn-primary { flex:2; padding:12px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-weight:700; transition:all var(--transition); }
+    .btn-primary:hover { background:var(--primary-dark); transform:translateY(-1px); }
+
+    /* AUTH GATE */
+    .cart-auth-gate { display:flex; flex-direction:column; align-items:center; gap:16px; padding:28px 20px 20px; text-align:center; }
+    .cart-auth-gate-icon { width:56px; height:56px; border-radius:50%; background:rgba(47,79,115,0.1); display:flex; align-items:center; justify-content:center; color:var(--primary); }
+    .cart-auth-gate-title { font-family:'Montserrat',sans-serif; font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:4px; }
+    .cart-auth-gate-sub { font-size:0.85rem; color:var(--text-muted); line-height:1.6; max-width:340px; }
+    .cart-auth-gate-btns { display:flex; gap:10px; width:100%; max-width:340px; }
+    .cart-auth-btn-login { flex:1; padding:11px 16px; background:var(--primary); color:white; border:none; border-radius:10px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
+    .cart-auth-btn-login:hover { background:var(--primary-dark); transform:translateY(-1px); }
+    .cart-auth-btn-signup { flex:1; padding:11px 16px; background:transparent; color:var(--primary); border:2px solid var(--primary); border-radius:10px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
+    .cart-auth-btn-signup:hover { background:rgba(47,79,115,0.08); }
+
+    /* AUTH MODAL */
+    .auth-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:2100; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s ease; backdrop-filter:blur(6px); padding:20px; }
+    .auth-modal-overlay.open { opacity:1; pointer-events:all; }
+    .auth-modal { background:var(--bg-card); border-radius:20px; width:100%; max-width:440px; padding:36px 32px 28px; transform:scale(0.95) translateY(20px); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow:0 24px 64px rgba(0,0,0,0.22); position:relative; overflow:hidden; }
+    .auth-modal::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#2F4F73,#3d8ee0,#C5302E); }
+    .auth-modal-overlay.open .auth-modal { transform:scale(1) translateY(0); }
+    .auth-modal-close { position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:1.5px solid var(--border); background:var(--bg); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; font-size:14px; }
+    .auth-modal-close:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .auth-logo-wrap { text-align:center; margin-bottom:6px; }
+    .auth-modal-title { font-family:'Montserrat',sans-serif; font-size:1.25rem; font-weight:800; color:var(--text-primary); text-align:center; margin-bottom:4px; }
+    .auth-modal-sub { font-size:0.83rem; color:var(--text-muted); text-align:center; margin-bottom:22px; }
+    .auth-tabs { display:flex; background:var(--bg); border-radius:10px; padding:3px; margin-bottom:22px; border:1px solid var(--border); }
+    .auth-tab { flex:1; padding:8px; border:none; border-radius:8px; background:transparent; color:var(--text-secondary); font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Nunito',sans-serif; }
+    .auth-tab.active { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(47,79,115,0.25); }
+    .auth-form-group { margin-bottom:14px; }
+    .auth-form-group label { display:block; font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-bottom:5px; }
+    .auth-form-group input { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-primary); font-size:0.9rem; outline:none; transition:border 0.2s,box-shadow 0.2s; font-family:'Inter',sans-serif; }
+    .auth-form-group input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(47,79,115,0.1); background:var(--bg-card); }
+    .auth-form-group input.error { border-color:var(--accent); }
+    .auth-form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .auth-error { font-size:0.78rem; color:var(--accent); margin-top:4px; display:none; }
+    .auth-error.show { display:block; }
+    .auth-submit-btn { width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:10px; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:'Nunito',sans-serif; margin-top:6px; }
+    .auth-submit-btn:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 16px rgba(47,79,115,0.3); }
+    .auth-submit-btn:disabled { opacity:0.7; transform:none; cursor:not-allowed; }
+    .auth-global-error { background:rgba(197,48,46,0.08); border:1px solid rgba(197,48,46,0.2); border-radius:8px; padding:10px 14px; font-size:0.82rem; color:var(--accent); margin-bottom:14px; display:none; }
+    .auth-global-error.show { display:block; }
+    .auth-success-msg { background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:8px; padding:10px 14px; font-size:0.82rem; color:#16a34a; margin-bottom:14px; display:none; }
+    .auth-success-msg.show { display:block; }
+
+    /* phone hint box */
+    .phone-hint { font-size:0.77rem; color:var(--text-muted); margin-top:5px; background:rgba(47,79,115,0.06); border-radius:6px; padding:6px 10px; line-height:1.5; }
+    .phone-hint strong { color:var(--primary); }
+
+    /* SUCCESS POPUP & TOAST */
+    .success-popup { position:fixed; bottom:28px; right:28px; background:var(--success); color:white; padding:16px 22px; border-radius:var(--radius-md); font-weight:700; font-size:0.95rem; box-shadow:var(--shadow-lg); z-index:2000; transform:translateX(120%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); display:flex; align-items:center; gap:10px; max-width:340px; }
+    .success-popup.show { transform:translateX(0); }
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text-primary); color:var(--bg-card); padding:12px 24px; border-radius:50px; font-size:0.9rem; font-weight:600; z-index:2000; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* SETTINGS */
+    .settings-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1200; opacity:0; pointer-events:none; transition:opacity var(--transition); backdrop-filter:blur(4px); }
+    .settings-overlay.open { opacity:1; pointer-events:all; }
+    .settings-panel { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:95vw; background:var(--bg-card); z-index:1300; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); padding:28px 24px; box-shadow:var(--shadow-xl); display:flex; flex-direction:column; gap:24px; overflow-y:auto; }
+    .settings-panel.open { transform:translateX(0); }
+    .settings-title { font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:space-between; }
+    .settings-group h4 { font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:12px; }
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.9rem; font-weight:500; }
+    .toggle { width:44px; height:24px; background:var(--border); border:none; border-radius:50px; position:relative; cursor:pointer; transition:background var(--transition); }
+    .toggle::after { content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:white; transition:transform var(--transition); box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+    .toggle.on { background:var(--primary); }
+    .toggle.on::after { transform:translateX(20px); }
+    .lang-btn { padding:8px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--text-secondary); font-size:0.85rem; font-weight:600; transition:all var(--transition); }
+    .lang-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+    .lang-group { display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* MENU DRAWER */
+    #menu-overlay { opacity:0; pointer-events:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:900; transition:opacity 0.3s ease; backdrop-filter:blur(3px); }
+    #menu-overlay.open { display:block; opacity:1; pointer-events:all; }
+    #menu-drawer { position:fixed; top:0; left:0; width:min(300px,88vw); height:100dvh; z-index:910; display:flex; flex-direction:column; transform:translateX(-100%); transition:transform 0.32s cubic-bezier(0.4,0,0.2,1); overflow:hidden; background:var(--menu-drawer-bg); border-right:1px solid rgba(255,255,255,0.06); }
+    #menu-drawer.open { transform:translateX(0); }
+    #menu-drawer::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(80,160,255,0.6),rgba(120,200,255,0.8),rgba(80,160,255,0.6),transparent); z-index:1; }
+    .menu-drawer-header { display:flex; align-items:center; justify-content:space-between; padding:20px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0; background:rgba(0,0,0,0.15); }
+    .menu-close-btn { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:7px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(255,255,255,0.5); transition:all 0.2s; }
+    .menu-close-btn:hover { background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.9); border-color:rgba(255,255,255,0.2); }
+    .menu-search-wrap { padding:14px 14px 10px; flex-shrink:0; }
+    .menu-search-inner { position:relative; display:flex; align-items:center; }
+    .menu-search-inner svg { position:absolute; left:10px; color:rgba(255,255,255,0.3); pointer-events:none; }
+    #menuSearchInput { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:8px; color:rgba(255,255,255,0.8); font-size:12.5px; padding:8px 10px 8px 32px; outline:none; box-sizing:border-box; transition:border-color 0.2s,background 0.2s; font-family:'Inter',sans-serif; }
+    #menuSearchInput::placeholder { color:rgba(255,255,255,0.25); }
+    #menuSearchInput:focus { border-color:rgba(80,160,255,0.45); background:rgba(255,255,255,0.08); }
+    .menu-section-label { font-size:9.5px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:rgba(255,255,255,0.28); padding:10px 18px 5px; flex-shrink:0; font-family:'Inter',sans-serif; }
+    .menu-categories { flex:1; overflow-y:auto; padding:4px 8px 16px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
+    .menu-categories::-webkit-scrollbar { width:3px; }
+    .menu-categories::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+    .menu-cat-btn { display:flex; align-items:center; gap:10px; width:100%; background:none; border:none; border-radius:8px; padding:9px 12px; cursor:pointer; text-align:left; color:rgba(255,255,255,0.58); font-size:13px; font-family:'Inter',sans-serif; font-weight:500; transition:background 0.16s,color 0.16s,transform 0.15s; margin-bottom:1px; position:relative; }
+    .menu-cat-btn:hover { background:rgba(80,160,255,0.1); color:rgba(255,255,255,0.9); transform:translateX(2px); }
+    .menu-cat-btn.active { background:rgba(80,160,255,0.15); color:#7bc4f7; }
+    .menu-cat-btn.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:2.5px; background:linear-gradient(180deg,#3d8ee0,#2F4F73); border-radius:2px; }
+    .menu-cat-btn .cat-icon { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.2); flex-shrink:0; transition:background 0.16s; }
+    .menu-cat-btn:hover .cat-icon { background:rgba(80,160,255,0.6); }
+    .menu-cat-btn.active .cat-icon { background:#3d8ee0; }
+    .menu-cat-btn .cat-label { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .menu-cat-count { font-size:10.5px; font-weight:600; color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:10px; flex-shrink:0; font-family:'Inter',sans-serif; transition:color 0.16s,background 0.16s; }
+    .menu-cat-btn.active .menu-cat-count { color:rgba(123,196,247,0.8); background:rgba(80,160,255,0.15); }
+    .menu-cat-divider { height:1px; background:rgba(255,255,255,0.06); margin:6px 12px 7px; flex-shrink:0; }
+
+    /* OFFER DETAIL PAGE */
+    #offer-page { display:none; padding:0; max-width:100%; }
+    .offer-hero-fullscreen { position:relative; width:100%; min-height:70vh; display:flex; align-items:flex-end; overflow:hidden; }
+    .offer-hero-bg { position:absolute; inset:0; background-size:cover; background-position:center top; background-repeat:no-repeat; z-index:0; animation:heroPan 20s ease-in-out infinite alternate; }
+    @keyframes heroPan { 0%{transform:scale(1.0) translateX(0)} 100%{transform:scale(1.06) translateX(-2%)} }
+    .offer-hero-netflix-fade { position:absolute; inset:0; z-index:1; background:linear-gradient(90deg,rgba(22,48,82,0.72) 0%,rgba(22,48,82,0.55) 28%,rgba(22,48,82,0.28) 55%,rgba(22,48,82,0.0) 80%),linear-gradient(0deg,rgba(10,20,35,0.55) 0%,rgba(10,20,35,0.18) 30%,transparent 60%); pointer-events:none; }
+    .offer-hero-content { position:relative; z-index:2; padding:48px 52px 56px; max-width:620px; width:100%; }
+    .offer-hero-content .offer-detail-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.82); font-size:0.88rem; font-weight:600; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:8px 16px; cursor:pointer; font-family:'Nunito',sans-serif; transition:background 0.2s,color 0.2s; margin-bottom:28px; backdrop-filter:blur(8px); }
+    .offer-hero-content .offer-detail-back:hover { background:rgba(80,160,255,0.25); color:#fff; border-color:rgba(80,160,255,0.4); }
+    .offer-detail-tag { display:inline-block; background:#C5302E; color:#fff; font-size:0.74rem; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:14px; }
+    .offer-detail-title { font-family:'Montserrat',sans-serif; font-size:clamp(1.6rem,5vw,2.4rem); font-weight:800; color:#fff; margin-bottom:12px; line-height:1.15; text-shadow:0 2px 20px rgba(0,0,0,0.6); }
+    .offer-detail-desc { color:rgba(255,255,255,0.85); font-size:1rem; max-width:480px; line-height:1.7; margin-bottom:22px; text-shadow:0 1px 8px rgba(0,0,0,0.7); }
+    .offer-detail-pricing { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .offer-detail-original-price { font-size:1rem; color:rgba(255,255,255,0.45); text-decoration:line-through; }
+    .offer-detail-new-price { font-size:1.8rem; font-weight:800; color:#fff; font-family:'Montserrat',sans-serif; text-shadow:0 2px 12px rgba(0,0,0,0.5); }
+    .offer-detail-discount-badge { background:#C5302E; color:#fff; font-size:0.82rem; font-weight:800; padding:4px 11px; border-radius:20px; }
+    .offer-detail-timer { display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.14); color:rgba(255,255,255,0.82); font-size:0.84rem; font-weight:600; padding:7px 14px; border-radius:10px; margin-top:6px; font-family:'Nunito',sans-serif; backdrop-filter:blur(8px); }
+    .offer-timer-countdown { font-weight:800; color:#fff; font-family:'Montserrat',sans-serif; font-size:0.93rem; }
+    .offer-detail-add-btn { display:inline-flex; align-items:center; gap:9px; margin-top:24px; padding:14px 28px; background:#C5302E; color:#fff; font-size:1rem; font-weight:700; border:none; border-radius:12px; cursor:pointer; font-family:'Nunito',sans-serif; transition:background 0.2s,transform 0.15s,box-shadow 0.2s; box-shadow:0 6px 24px rgba(197,48,46,0.45); }
+    .offer-detail-add-btn:hover { background:#a82522; transform:translateY(-2px); box-shadow:0 8px 28px rgba(197,48,46,0.6); }
+    .offer-detail-add-btn:disabled { background:rgba(255,255,255,0.2); cursor:not-allowed; transform:none; box-shadow:none; }
+    .offer-detail-products-section { padding:36px 28px 60px; max-width:1280px; margin:0 auto; }
+    .offer-detail-products-title { font-size:1.1rem; font-weight:700; color:var(--text-primary); margin-bottom:20px; font-family:'Nunito',sans-serif; display:flex; align-items:center; gap:9px; }
+    .offer-detail-products-title::before { content:''; display:inline-block; width:4px; height:20px; background:#C5302E; border-radius:2px; flex-shrink:0; }
+
+    /* FOOTER */
+    #site-footer { background:var(--bg-footer); color:rgba(255,255,255,0.8); padding:56px 20px 28px; }
+    .footer-inner { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:40px; }
+    .footer-brand p { font-size:0.88rem; margin-top:12px; line-height:1.7; opacity:0.75; max-width:280px; }
+    .footer-col h5 { font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.45); margin-bottom:16px; }
+    .footer-col a, .footer-col p { display:flex; align-items:flex-start; gap:8px; font-size:0.88rem; color:rgba(255,255,255,0.72); margin-bottom:10px; transition:color var(--transition); line-height:1.5; }
+    .footer-col a:hover { color:white; }
+    .footer-col a svg, .footer-col p svg { flex-shrink:0; margin-top:2px; }
+    .footer-social { display:flex; gap:10px; margin-top:8px; }
+    .social-btn { width:38px; height:38px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.7); transition:all var(--transition); }
+    .social-btn:hover { background:var(--accent); border-color:var(--accent); color:white; transform:translateY(-3px); }
+    .footer-bottom { border-top:1px solid rgba(255,255,255,0.1); padding-top:24px; text-align:center; font-size:0.82rem; color:rgba(255,255,255,0.4); }
+
+    /* UTILITY */
+    .hidden { display:none !important; }
+    .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .section-loading { padding:60px 0; display:flex; flex-direction:column; align-items:center; gap:14px; color:var(--text-muted); }
+
+    /* RESPONSIVE */
+    @media (max-width:900px) { .product-detail-grid{grid-template-columns:1fr} .footer-inner{grid-template-columns:1fr 1fr;gap:28px} .offer-hero-fullscreen{min-height:60vh} .offer-hero-content{padding:32px 28px 40px} }
+    @media (max-width:680px) { .header-inner{gap:8px} .products-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px} .slide-content{padding:28px 22px} .slide-title{font-size:1.35rem} .footer-inner{grid-template-columns:1fr;gap:24px} .cart-drawer{width:100%} .offer-hero-content{padding:24px 20px 32px;max-width:100%} }
+    @media (max-width:420px) { .logo-orien{font-size:1.6rem} main{padding:18px 12px 48px} }
+  </style>
+</head>
+<body>
+
+<div id="cursor-glow"></div>
+
+<!-- HEADER -->
+<header id="site-header">
+  <div class="header-inner">
+    <button id="hamburger-btn" aria-label="Menyja" title="Menyja">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="#" class="header-logo" onclick="showHome(event)">
+      <span class="logo-orien">Orien</span>
+    </a>
+    <div style="flex:1;"></div>
+    <div class="header-actions">
+      <div class="header-search-expandable" id="headerSearchWrap">
+        <div class="search-expand-wrap" id="searchExpandWrap">
+          <div class="search-expand-inner">
+            <span class="search-icon-inner">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </span>
+            <input type="text" id="searchInput" placeholder="Kërko produkte..." autocomplete="off"/>
+          </div>
+        </div>
+        <button class="search-toggle-btn" id="searchToggleBtn" aria-label="Kërko">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <div class="search-results-dropdown" id="searchDropdown"></div>
+      </div>
+      <button class="icon-btn" id="cartBtn" title="Shporta" aria-label="Shporta">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Cilësimet" aria-label="Cilësimet">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="user-dropdown-wrap" id="userDropdownWrap">
+        <button class="icon-btn" id="userBtn" title="Llogaria" aria-label="Llogaria" style="padding:2px;">
+          <span class="user-avatar-btn" id="userAvatarBtn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="user-dropdown-header" id="userDropdownHeader">
+            <div class="user-dropdown-name" id="userDropdownName">—</div>
+            <div class="user-dropdown-email" id="userDropdownEmail">—</div>
+          </div>
+          <button class="user-dropdown-item danger" id="signOutBtn">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Dil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="active-cat-chip">
+  <span>Kategoria:</span>
+  <strong id="chip-label"></strong>
+  <button class="chip-clear" id="chipClear">✕ Të gjitha</button>
+</div>
+
+<nav id="category-bar" style="display:none">
+  <div class="category-bar-inner" id="categoryBar">
+    <button class="cat-btn active" data-cat="all">Të gjitha</button>
+  </div>
+</nav>
+
+<div id="menu-overlay"></div>
+
+<aside id="menu-drawer" role="navigation" aria-label="Menu kryesore">
+  <div class="menu-drawer-header">
+    <div class="menu-drawer-brand">
+      <span class="menu-logo-orien">Orien</span>
+    </div>
+    <button class="menu-close-btn" id="menuCloseBtn" aria-label="Mbyll menynë">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="menu-search-wrap">
+    <div class="menu-search-inner">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="menuSearchInput" placeholder="Filtro kategoritë..." autocomplete="off"/>
+    </div>
+  </div>
+  <div class="menu-section-label" id="menuSectionLabel">Kategoritë</div>
+  <div class="menu-categories" id="menuCategoriesList">
+    <button class="menu-cat-btn active" data-cat="all" id="menuAllBtn">
+      <span class="cat-icon"></span>
+      <span class="cat-label" id="menuAllLabel">Të gjitha</span>
+      <span class="menu-cat-count" id="menuAllCount">0</span>
+    </button>
+  </div>
+</aside>
+
+<!-- HOME PAGE -->
+<main id="home-page">
+  <section class="offers-section">
+    <h2><span id="offersTitle">Ofertat Speciale</span> <span class="badge">HOT</span></h2>
+    <div class="slider-wrapper" id="sliderWrapper">
+      <div class="slider-track" id="sliderTrack">
+        <div class="slide" style="background:linear-gradient(135deg,#2F4F73,#3d6491)">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-tag">Mirë se vini</div>
+            <div class="slide-title">Farmaci Orien</div>
+            <div class="slide-desc">Farmacia juaj e besuar. Shërbim me cilësi, çmime të arsyeshme.</div>
+          </div>
+        </div>
+      </div>
+      <button class="slider-btn prev" id="sliderPrev">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button class="slider-btn next" id="sliderNext">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+  </section>
+
+  <div id="productsSection">
+    <div class="section-title" id="sectionTitle">Të gjitha produktet</div>
+    <div class="products-grid" id="productsGrid">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+  </div>
+</main>
+
+<!-- PRODUCT DETAIL PAGE -->
+<main id="product-page" style="display:none">
+  <div class="product-detail">
+    <button class="back-btn" onclick="showHome()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      <span id="backText">Kthehu</span>
+    </button>
+    <div class="product-detail-grid">
+      <div class="product-detail-img"><img id="detailImg" src="" alt=""/></div>
+      <div class="product-detail-info">
+        <div class="product-detail-cat" id="detailCat"></div>
+        <div class="product-detail-name" id="detailName"></div>
+        <div class="product-detail-price-wrap">
+          <div class="product-detail-price" id="detailPrice"></div>
+          <div class="product-detail-original" id="detailOriginal" style="display:none"></div>
+        </div>
+        <div class="product-detail-desc" id="detailDesc"></div>
+        <div class="product-detail-sasia" id="detailSasia"></div>
+        <button class="product-detail-add" id="detailAddBtn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span id="addToCartText">Shto në shportë</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- OFFER DETAIL PAGE -->
+<main id="offer-page" style="display:none; padding:0; max-width:100%;">
+  <div class="offer-hero-fullscreen" id="offerHeroFullscreen">
+    <div class="offer-hero-bg" id="offerHeroBg"></div>
+    <div class="offer-hero-netflix-fade"></div>
+    <div class="offer-hero-content">
+      <button class="offer-detail-back" id="offerBackBtn">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+        <span id="offerBackText">Kthehu</span>
+      </button>
+      <div class="offer-detail-tag" id="offerDetailTag"></div>
+      <div class="offer-detail-title" id="offerDetailTitle"></div>
+      <div class="offer-detail-desc" id="offerDetailDesc"></div>
+      <div class="offer-detail-pricing">
+        <span class="offer-detail-original-price" id="offerDetailOriginalPrice"></span>
+        <span class="offer-detail-new-price" id="offerDetailNewPrice"></span>
+        <span class="offer-detail-discount-badge" id="offerDetailDiscBadge"></span>
+      </div>
+      <div class="offer-detail-timer" id="offerDetailTimerRow" style="display:none">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Mbaron në:</span>
+        <span class="offer-timer-countdown" id="offerTimerCountdown"></span>
+      </div>
+      <button class="offer-detail-add-btn" id="offerAddAllBtn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span id="offerAddAllText">Shto të gjitha në shportë</span>
+      </button>
+    </div>
+  </div>
+  <div class="offer-detail-products-section">
+    <div class="offer-detail-products-title" id="offerProductsTitle">Produktet e Ofertës</div>
+    <div class="products-grid" id="offerProductsGrid"></div>
+  </div>
+</main>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3 id="cartTitle">🛒 Shporta</h3>
+    <button class="close-btn" onclick="closeCart()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span id="cartTotalLabel">Total:</span>
+      <span id="cartTotal">0 Lekë</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn">
+      <span id="checkoutText">Porosit Tani</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal">
+    <h3 id="orderTitle">Detajet e Porosisë</h3>
+    <div id="orderAuthGate" style="display:none;">
+      <div class="cart-auth-gate">
+        <div class="cart-auth-gate-icon">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="cart-auth-gate-title">Hyni për të vazhduar</div>
+          <div class="cart-auth-gate-sub">Ju lutem hyni ose krijoni llogari për të bërë porosinë tuaj.</div>
+        </div>
+        <div class="cart-auth-gate-btns">
+          <button class="cart-auth-btn-login" id="gateLoginBtn">Hyr</button>
+          <button class="cart-auth-btn-signup" id="gateSignupBtn">Regjistrohu</button>
+        </div>
+      </div>
+      <div class="modal-actions" style="padding-top:0;">
+        <button class="btn-secondary" onclick="closeOrderModal()" id="cancelBtn">Anulo</button>
+      </div>
+    </div>
+    <div id="orderLoggedInForm" style="display:none;">
+      <div style="margin-bottom:16px;">
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <svg width="18" height="18" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <div>
+            <div style="font-size:0.85rem;font-weight:700;color:#16a34a;" id="orderUserName">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);" id="orderUserPhone">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label id="labelAdresa">Adresa e Dorëzimit *</label>
+        <div style="position:relative;">
+          <input type="text" id="locationSearch" placeholder="Shkruaj adresën e dorëzimit" required/>
+          <button type="button" id="geoLocBtn" title="Përdor vendndodhjen time" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--primary);padding:4px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;" onmouseenter="this.style.background='rgba(47,79,115,0.1)'" onmouseleave="this.style.background='none'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="1 3"/></svg>
+          </button>
+        </div>
+        <div class="form-error" id="errLocation"></div>
+      </div>
+      <div class="form-group">
+        <label id="labelShenime">Shënime (opsionale)</label>
+        <textarea id="orderNotes" rows="3" placeholder="Instruksione shtesë..."></textarea>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text-muted);background:rgba(47,79,115,0.07);padding:10px 14px;border-radius:8px;margin-bottom:4px;">
+        💵 <strong id="paymentNote">Pagesa bëhet me para në dorë kur dorëzimi të arrijë.</strong>
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeOrderModal()">Anulo</button>
+        <button class="btn-primary" id="placeOrderBtn">
+          <span id="placeOrderText">Konfirmo Porosinë</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="auth-modal-close" id="authModalClose">✕</button>
+    <div class="auth-logo-wrap">
+      <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1.6rem;color:#C5302E;font-style:italic;">Orien</span>
+    </div>
+    <div class="auth-modal-title" id="authModalTitle">Mirë se vini</div>
+    <div class="auth-modal-sub" id="authModalSub">Hyni ose krijoni llogari</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Hyr</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Regjistrohu</button>
+    </div>
+    <div class="auth-global-error" id="authGlobalError"></div>
+    <div class="auth-success-msg" id="authSuccessMsg"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="authLoginForm">
+      <div class="auth-form-row">
+        <div class="auth-form-group">
+          <label>Emri *</label>
+          <input type="text" id="loginName" placeholder="Emri juaj" autocomplete="given-name"/>
+          <div class="auth-error" id="errLoginName"></div>
+        </div>
+        <div class="auth-form-group">
+          <label>Mbiemri *</label>
+          <input type="text" id="loginLastName" placeholder="Mbiemri juaj" autocomplete="family-name"/>
+          <div class="auth-error" id="errLoginLastName"></div>
+        </div>
+      </div>
+      <div class="auth-form-group">
+        <label>Nr. Telefoni *</label>
+        <input type="tel" id="loginPhone" placeholder="0694918535" autocomplete="tel"/>
+        <div class="auth-error" id="errLoginPhone"></div>
+        <div class="phone-hint">Shkruaj numrin shqiptar pa +355 — p.sh. <strong>0694918535</strong></div>
+      </div>
+      <button class="auth-submit-btn" id="loginSubmitBtn" onclick="doLogin()">Hyr në llogari</button>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div id="authSignupForm" style="display:none;">
+      <div class="auth-form-row">
+        <div class="auth-form-group">
+          <label>Emri *</label>
+          <input type="text" id="signupName" placeholder="Emri juaj" autocomplete="given-name"/>
+          <div class="auth-error" id="errSignupName"></div>
+        </div>
+        <div class="auth-form-group">
+          <label>Mbiemri *</label>
+          <input type="text" id="signupLastName" placeholder="Mbiemri juaj" autocomplete="family-name"/>
+          <div class="auth-error" id="errSignupLastName"></div>
+        </div>
+      </div>
+      <div class="auth-form-group">
+        <label>Nr. Telefoni *</label>
+        <input type="tel" id="signupPhone" placeholder="0694918535" autocomplete="tel"/>
+        <div class="auth-error" id="errSignupPhone"></div>
+        <div class="phone-hint">Shkruaj numrin shqiptar — p.sh. <strong>0694918535</strong> ose <strong>+355694918535</strong></div>
+      </div>
+      <button class="auth-submit-btn" id="signupSubmitBtn" onclick="doSignup()">Krijo llogari</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-title">
+    <span id="settingsLabel">⚙️ Cilësimet</span>
+    <button class="close-btn" onclick="closeSettings()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="settings-group">
+    <h4 id="themeLabel">Pamja</h4>
+    <div class="toggle-row">
+      <span id="darkModeLabel">Modaliteti i Errët</span>
+      <button class="toggle" id="darkToggle" onclick="toggleDark()" aria-label="Dark mode"></button>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h4 id="langLabel">Gjuha</h4>
+    <div class="lang-group">
+      <button class="lang-btn active" onclick="setLang('sq')" id="langSq">🇦🇱 Shqip</button>
+      <button class="lang-btn" onclick="setLang('en')" id="langEn">🇬🇧 English</button>
+      <button class="lang-btn" onclick="setLang('it')" id="langIt">🇮🇹 Italiano</button>
+      <button class="lang-btn" onclick="setLang('de')" id="langDe">🇩🇪 Deutsch</button>
+      <button class="lang-btn" onclick="setLang('fr')" id="langFr">🇫🇷 Français</button>
+      <button class="lang-btn" onclick="setLang('el')" id="langEl">🇬🇷 Ελληνικά</button>
+      <button class="lang-btn" onclick="setLang('tr')" id="langTr">🇹🇷 Türkçe</button>
+      <button class="lang-btn" onclick="setLang('ar')" id="langAr">🇸🇦 العربية</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div class="success-popup" id="successPopup">
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="successMsg">Porosia u dërgua me sukses! 🎉</span>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo-orien">Orien</span>
+      <p id="footerTagline">Farmacia juaj e besuar. Shërbim me cilësi të lartë dhe çmime të arsyeshme për të gjithë.</p>
+      <div class="footer-social">
+        <a href="https://instagram.com/farmaci_orien" target="_blank" rel="noopener" class="social-btn" title="Instagram">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="https://wa.me/355692054446" target="_blank" rel="noopener" class="social-btn" title="WhatsApp Orien 1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5 id="footerLocH">Lokacionet</h5>
+      <p><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span><strong>Orien 1:</strong> Kryqëzimi "Merdar Shtylla", Komuna e Parisit</span></p>
+      <p><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span><strong>Orien 2:</strong> Unaza e Re, Astir</span></p>
+    </div>
+    <div class="footer-col">
+      <h5 id="footerContactH">Kontakti</h5>
+      <a href="tel:+355692054446"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6.29 6.29l.89-.89a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Orien 1: 069 205 4446</a>
+      <a href="tel:+355692054443"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6.29 6.29l.89-.89a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Orien 2: 069 205 4443</a>
+      <a href="https://wa.me/355692054446" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>WhatsApp Orien 1</a>
+      <a href="https://wa.me/355692054443" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>WhatsApp Orien 2</a>
+    </div>
+    <div class="footer-col">
+      <h5 id="footerInstH">Instagram</h5>
+      <a href="https://instagram.com/farmaci_orien" target="_blank" rel="noopener">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        @farmaci_orien
+      </a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p id="footerCopy">© 2024 Farmaci Orien. Të gjitha të drejtat e rezervuara.</p>
+  </div>
+</footer>
+
+<script type="module">
+import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, addDoc, serverTimestamp,
+  doc, setDoc, getDoc, query, where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyA65eOAfzHpOuxgGA9765kjn-U3-f0KJU8",
+  authDomain:        "farmaciorien.firebaseapp.com",
+  projectId:         "farmaciorien",
+  storageBucket:     "farmaciorien.appspot.com",
+  messagingSenderId: "1051714146552",
+  appId:             "1:1051714146552:web:b6ccda5711e41324e1ab0d"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+emailjs.init("gVNBZgU2BBiIjPLf6");
+
+// =====================================================================
+// PHONE HELPERS
+// =====================================================================
+/**
+ * Normalise any Albanian phone input to the +355XXXXXXXXX format
+ * that Firebase Auth / Firestore stores.
+ *
+ * Accepts:
+ *   0694918535        → +355694918535
+ *   +355694918535     → +355694918535
+ *   355694918535      → +355694918535
+ */
+function normalisePhone(raw) {
+  const clean = raw.replace(/\s+/g, '').replace(/-/g, '');
+  if (clean.startsWith('+355')) return clean;
+  if (clean.startsWith('355'))  return '+' + clean;
+  if (clean.startsWith('06'))   return '+355' + clean.slice(1); // 06... → +3556...
+  if (clean.startsWith('6'))    return '+3556' + clean.slice(1); // 69...  → +35569...
+  return clean; // return as-is and let validation catch it
+}
+
+/**
+ * Validate that the raw input looks like an Albanian mobile number.
+ * Accepts 06XXXXXXXX (10 digits) or +355XXXXXXXXX (12 chars).
+ */
+function isValidPhone(raw) {
+  const clean = raw.replace(/\s+/g, '').replace(/-/g, '');
+  // local format: 06X XXXXXXX  (10 digits, starts with 06)
+  if (/^06\d{8}$/.test(clean)) return true;
+  // international: +355 6X XXXXXXX
+  if (/^\+3556\d{8}$/.test(clean)) return true;
+  // without +
+  if (/^3556\d{8}$/.test(clean)) return true;
+  return false;
+}
+
+// =====================================================================
+// SESSION
+// =====================================================================
+function getSession() { try { return JSON.parse(localStorage.getItem('fo_session') || 'null'); } catch { return null; } }
+function setSession(p) { localStorage.setItem('fo_session', JSON.stringify(p)); }
+function clearSession() { localStorage.removeItem('fo_session'); }
+
+// =====================================================================
+// GLOBAL STATE
+// =====================================================================
+let products        = [];
+let offers          = [];
+let cart            = JSON.parse(localStorage.getItem('fo_cart') || '[]');
+let currentLang     = localStorage.getItem('fo_lang') || 'sq';
+let currentCat      = 'all';
+let sliderIndex     = 0;
+let sliderTimer     = null;
+let slideCount      = 1;
+let offerTimerInterval = null;
+let _authFromOrderModal = false;
+let currentUserProfile = getSession();
+
+// =====================================================================
+// CURSOR GLOW
+// =====================================================================
+const cursorGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => { cursorGlow.style.left = e.clientX + 'px'; cursorGlow.style.top = e.clientY + 'px'; });
+document.addEventListener('mouseleave', () => { cursorGlow.style.opacity = '0'; });
+document.addEventListener('mouseenter', () => { cursorGlow.style.opacity = '1'; });
+
+// =====================================================================
+// AMBIENT BG
+// =====================================================================
+(function initBgLight() {
+  const bg = document.createElement('div');
+  bg.id = 'bg-ambient-light';
+  bg.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;';
+  bg.innerHTML = '<div class="ambient-orb orb-1"></div><div class="ambient-orb orb-2"></div>';
+  document.body.insertBefore(bg, document.body.firstChild);
+})();
+
+// =====================================================================
+// EXPANDABLE SEARCH
+// =====================================================================
+const searchToggleBtn  = document.getElementById('searchToggleBtn');
+const searchExpandWrap = document.getElementById('searchExpandWrap');
+const searchInput      = document.getElementById('searchInput');
+
+searchToggleBtn.addEventListener('click', () => {
+  const isOpen = searchExpandWrap.classList.contains('open');
+  if (isOpen) {
+    searchExpandWrap.classList.remove('open');
+    searchToggleBtn.classList.remove('open');
+    document.getElementById('searchDropdown').classList.remove('active');
+    searchInput.value = '';
+  } else {
+    searchExpandWrap.classList.add('open');
+    searchToggleBtn.classList.add('open');
+    setTimeout(() => searchInput.focus(), 320);
+  }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#headerSearchWrap')) {
+    searchExpandWrap.classList.remove('open');
+    searchToggleBtn.classList.remove('open');
+    document.getElementById('searchDropdown').classList.remove('active');
+  }
+});
+
+// =====================================================================
+// TRANSLATIONS
+// =====================================================================
+const T = {
+  sq: { search:"Kërko produkte...", menuSearch:"Filtro kategoritë...", offers:"Ofertat Speciale", allCat:"Të gjitha", allProducts:"Të gjitha produktet", back:"Kthehu", addToCart:"Shto në shportë", outOfStock:"Jashtë stokut", cartTitle:"🛒 Shporta", total:"Total:", checkout:"Porosit Tani", orderTitle:"Detajet e Porosisë", adresa:"Adresa e Dorëzimit *", shenime:"Shënime (opsionale)", payNote:"💵 Pagesa bëhet me para në dorë kur dorëzimi të arrijë.", cancel:"Anulo", confirm:"Konfirmo Porosinë", success:"Porosia u dërgua me sukses! 🎉", settings:"⚙️ Cilësimet", theme:"Pamja", darkMode:"Modaliteti i Errët", language:"Gjuha", errPhone:"Numri duhet të fillojë me 06 ose +355 dhe të ketë formatin e duhur", errAddr:"Adresa është e detyrueshme", cartEmpty:"Shporta është bosh", noProducts:"Nuk u gjetën produkte", sasia:"Sasia:", qty:"Sasi", remove:"Hiq", menuCategories:"Kategoritë", chipClear:"✕ Të gjitha", footerTag:"Farmacia juaj e besuar. Shërbim me cilësi të lartë dhe çmime të arsyeshme për të gjithë.", footerLoc:"Lokacionet", footerContact:"Kontakti", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Të gjitha të drejtat e rezervuara.", offerProducts:"Produktet e Ofertës", addAllToCart:"Shto të gjitha në shportë", offerAdded:"Oferta u shtua në shportë ✓" },
+  en: { search:"Search products...", menuSearch:"Filter categories...", offers:"Special Offers", allCat:"All", allProducts:"All products", back:"Back", addToCart:"Add to cart", outOfStock:"Out of stock", cartTitle:"🛒 Cart", total:"Total:", checkout:"Order Now", orderTitle:"Order Details", adresa:"Delivery Address *", shenime:"Notes (optional)", payNote:"💵 Payment is made in cash upon delivery.", cancel:"Cancel", confirm:"Confirm Order", success:"Order placed successfully! 🎉", settings:"⚙️ Settings", theme:"Appearance", darkMode:"Dark Mode", language:"Language", errPhone:"Please enter a valid Albanian phone number (06XXXXXXXX)", errAddr:"Address is required", cartEmpty:"Your cart is empty", noProducts:"No products found", sasia:"Quantity:", qty:"Qty", remove:"Remove", menuCategories:"Categories", chipClear:"✕ All", footerTag:"Your trusted pharmacy. Quality service and fair prices for everyone.", footerLoc:"Locations", footerContact:"Contact", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. All rights reserved.", offerProducts:"Offer Products", addAllToCart:"Add all to cart", offerAdded:"Offer added to cart ✓" },
+  it: { search:"Cerca prodotti...", menuSearch:"Filtra categorie...", offers:"Offerte Speciali", allCat:"Tutti", allProducts:"Tutti i prodotti", back:"Indietro", addToCart:"Aggiungi al carrello", outOfStock:"Esaurito", cartTitle:"🛒 Carrello", total:"Totale:", checkout:"Ordina Ora", orderTitle:"Dettagli Ordine", adresa:"Indirizzo di Consegna *", shenime:"Note (opzionale)", payNote:"💵 Il pagamento avviene in contanti alla consegna.", cancel:"Annulla", confirm:"Conferma Ordine", success:"Ordine inviato con successo! 🎉", settings:"⚙️ Impostazioni", theme:"Aspetto", darkMode:"Modalità Scura", language:"Lingua", errPhone:"Inserisci un numero di telefono albanese valido", errAddr:"L'indirizzo è obbligatorio", cartEmpty:"Il carrello è vuoto", noProducts:"Nessun prodotto trovato", sasia:"Quantità:", qty:"Qtà", remove:"Rimuovi", menuCategories:"Categorie", chipClear:"✕ Tutti", footerTag:"La tua farmacia di fiducia. Servizio di qualità e prezzi equi per tutti.", footerLoc:"Posizioni", footerContact:"Contatto", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Tutti i diritti riservati.", offerProducts:"Prodotti dell'Offerta", addAllToCart:"Aggiungi tutto al carrello", offerAdded:"Offerta aggiunta al carrello ✓" },
+  de: { search:"Produkte suchen...", menuSearch:"Kategorien filtern...", offers:"Sonderangebote", allCat:"Alle", allProducts:"Alle Produkte", back:"Zurück", addToCart:"In den Warenkorb", outOfStock:"Nicht vorrätig", cartTitle:"🛒 Warenkorb", total:"Gesamt:", checkout:"Jetzt bestellen", orderTitle:"Bestelldetails", adresa:"Lieferadresse *", shenime:"Anmerkungen (optional)", payNote:"💵 Zahlung erfolgt bei Lieferung in bar.", cancel:"Abbrechen", confirm:"Bestellung bestätigen", success:"Bestellung erfolgreich aufgegeben! 🎉", settings:"⚙️ Einstellungen", theme:"Darstellung", darkMode:"Dunkelmodus", language:"Sprache", errPhone:"Bitte geben Sie eine gültige albanische Telefonnummer ein", errAddr:"Adresse ist erforderlich", cartEmpty:"Warenkorb ist leer", noProducts:"Keine Produkte gefunden", sasia:"Menge:", qty:"Menge", remove:"Entfernen", menuCategories:"Kategorien", chipClear:"✕ Alle", footerTag:"Ihre vertrauenswürdige Apotheke. Qualitätsservice zu fairen Preisen für alle.", footerLoc:"Standorte", footerContact:"Kontakt", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Alle Rechte vorbehalten.", offerProducts:"Angebotsprodukte", addAllToCart:"Alle in den Warenkorb", offerAdded:"Angebot in den Warenkorb gelegt ✓" },
+  fr: { search:"Rechercher des produits...", menuSearch:"Filtrer les catégories...", offers:"Offres Spéciales", allCat:"Tous", allProducts:"Tous les produits", back:"Retour", addToCart:"Ajouter au panier", outOfStock:"Rupture de stock", cartTitle:"🛒 Panier", total:"Total :", checkout:"Commander maintenant", orderTitle:"Détails de la commande", adresa:"Adresse de livraison *", shenime:"Notes (facultatif)", payNote:"💵 Le paiement s'effectue en espèces à la livraison.", cancel:"Annuler", confirm:"Confirmer la commande", success:"Commande passée avec succès ! 🎉", settings:"⚙️ Paramètres", theme:"Apparence", darkMode:"Mode Sombre", language:"Langue", errPhone:"Veuillez entrer un numéro de téléphone albanais valide", errAddr:"L'adresse est requise", cartEmpty:"Votre panier est vide", noProducts:"Aucun produit trouvé", sasia:"Quantité :", qty:"Qté", remove:"Supprimer", menuCategories:"Catégories", chipClear:"✕ Tous", footerTag:"Votre pharmacie de confiance. Service de qualité à prix équitables pour tous.", footerLoc:"Emplacements", footerContact:"Contact", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Tous droits réservés.", offerProducts:"Produits de l'Offre", addAllToCart:"Tout ajouter au panier", offerAdded:"Offre ajoutée au panier ✓" },
+  el: { search:"Αναζήτηση προϊόντων...", menuSearch:"Φιλτράρισμα κατηγοριών...", offers:"Ειδικές Προσφορές", allCat:"Όλα", allProducts:"Όλα τα προϊόντα", back:"Πίσω", addToCart:"Προσθήκη στο καλάθι", outOfStock:"Εκτός αποθέματος", cartTitle:"🛒 Καλάθι", total:"Σύνολο:", checkout:"Παραγγελία τώρα", orderTitle:"Λεπτομέρειες παραγγελίας", adresa:"Διεύθυνση παράδοσης *", shenime:"Σημειώσεις (προαιρετικό)", payNote:"💵 Η πληρωμή γίνεται με μετρητά κατά την παράδοση.", cancel:"Ακύρωση", confirm:"Επιβεβαίωση παραγγελίας", success:"Η παραγγελία υποβλήθηκε επιτυχώς! 🎉", settings:"⚙️ Ρυθμίσεις", theme:"Εμφάνιση", darkMode:"Σκοτεινή λειτουργία", language:"Γλώσσα", errPhone:"Εισάγετε έγκυρο αλβανικό αριθμό τηλεφώνου", errAddr:"Η διεύθυνση είναι υποχρεωτική", cartEmpty:"Το καλάθι σας είναι άδειο", noProducts:"Δεν βρέθηκαν προϊόντα", sasia:"Ποσότητα:", qty:"Ποσ.", remove:"Αφαίρεση", menuCategories:"Κατηγορίες", chipClear:"✕ Όλα", footerTag:"Το αξιόπιστο φαρμακείο σας. Ποιοτική εξυπηρέτηση σε λογικές τιμές για όλους.", footerLoc:"Τοποθεσίες", footerContact:"Επικοινωνία", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Με επιφύλαξη παντός δικαιώματος.", offerProducts:"Προϊόντα Προσφοράς", addAllToCart:"Προσθήκη όλων στο καλάθι", offerAdded:"Η προσφορά προστέθηκε στο καλάθι ✓" },
+  tr: { search:"Ürün ara...", menuSearch:"Kategorileri filtrele...", offers:"Özel Teklifler", allCat:"Tümü", allProducts:"Tüm ürünler", back:"Geri", addToCart:"Sepete ekle", outOfStock:"Stokta yok", cartTitle:"🛒 Sepet", total:"Toplam:", checkout:"Şimdi sipariş ver", orderTitle:"Sipariş Detayları", adresa:"Teslimat Adresi *", shenime:"Notlar (isteğe bağlı)", payNote:"💵 Ödeme teslimatta nakit olarak yapılır.", cancel:"İptal", confirm:"Siparişi Onayla", success:"Sipariş başarıyla verildi! 🎉", settings:"⚙️ Ayarlar", theme:"Görünüm", darkMode:"Karanlık Mod", language:"Dil", errPhone:"Geçerli bir Arnavutluk telefon numarası girin", errAddr:"Adres zorunludur", cartEmpty:"Sepetiniz boş", noProducts:"Ürün bulunamadı", sasia:"Miktar:", qty:"Adet", remove:"Kaldır", menuCategories:"Kategoriler", chipClear:"✕ Tümü", footerTag:"Güvenilir eczaneniz. Herkes için kaliteli hizmet ve makul fiyatlar.", footerLoc:"Konumlar", footerContact:"İletişim", footerInst:"Instagram", footerCopy:"© 2024 Farmaci Orien. Tüm hakları saklıdır.", offerProducts:"Teklif Ürünleri", addAllToCart:"Tümünü sepete ekle", offerAdded:"Teklif sepete eklendi ✓" },
+  ar: { search:"ابحث عن المنتجات...", menuSearch:"تصفية الفئات...", offers:"العروض الخاصة", allCat:"الكل", allProducts:"جميع المنتجات", back:"رجوع", addToCart:"أضف إلى السلة", outOfStock:"نفدت الكمية", cartTitle:"🛒 السلة", total:"المجموع:", checkout:"اطلب الآن", orderTitle:"تفاصيل الطلب", adresa:"عنوان التسليم *", shenime:"ملاحظات (اختياري)", payNote:"💵 الدفع نقداً عند التسليم.", cancel:"إلغاء", confirm:"تأكيد الطلب", success:"تم تقديم الطلب بنجاح! 🎉", settings:"⚙️ الإعدادات", theme:"المظهر", darkMode:"الوضع المظلم", language:"اللغة", errPhone:"أدخل رقم هاتف ألباني صالح", errAddr:"العنوان مطلوب", cartEmpty:"سلتك فارغة", noProducts:"لم يتم العثور على منتجات", sasia:"الكمية:", qty:"كمية", remove:"إزالة", menuCategories:"الفئات", chipClear:"✕ الكل", footerTag:"صيدليتك الموثوقة. خدمة عالية الجودة بأسعار معقولة للجميع.", footerLoc:"المواقع", footerContact:"التواصل", footerInst:"إنستغرام", footerCopy:"© 2024 Farmaci Orien. جميع الحقوق محفوظة.", offerProducts:"منتجات العرض", addAllToCart:"أضف الكل إلى السلة", offerAdded:"تمت إضافة العرض إلى السلة ✓" }
+};
+function t(key) { return (T[currentLang] && T[currentLang][key]) || T.sq[key] || key; }
+
+// =====================================================================
+// HAMBURGER MENU
+// =====================================================================
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const menuOverlay  = document.getElementById('menu-overlay');
+const menuDrawer   = document.getElementById('menu-drawer');
+
+function openMenu()  { menuDrawer.classList.add('open'); menuOverlay.classList.add('open'); hamburgerBtn.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeMenu() { menuDrawer.classList.remove('open'); menuOverlay.classList.remove('open'); hamburgerBtn.classList.remove('open'); document.body.style.overflow=''; }
+
+hamburgerBtn.addEventListener('click', openMenu);
+menuOverlay.addEventListener('click', closeMenu);
+document.getElementById('menuCloseBtn').addEventListener('click', closeMenu);
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeMenu(); closeAuthModal(); } });
+
+document.getElementById('menuSearchInput').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll('.menu-cat-btn').forEach(btn => {
+    if (btn.dataset.cat==='all') { btn.style.display=''; return; }
+    const label = btn.querySelector('.cat-label').textContent.toLowerCase();
+    btn.style.display = (!q || label.includes(q)) ? '' : 'none';
+  });
+  const divider = document.getElementById('menu-cat-divider');
+  if (divider) divider.style.display = q ? 'none' : '';
+});
+
+document.getElementById('chipClear').addEventListener('click', () => filterByCategory('all'));
+
+function updateChip(cat) {
+  const chip = document.getElementById('active-cat-chip');
+  if (!cat || cat==='all') { chip.classList.remove('visible'); }
+  else { chip.classList.add('visible'); document.getElementById('chip-label').textContent = cat; document.getElementById('chipClear').textContent = t('chipClear'); }
+}
+
+// =====================================================================
+// AUTH UI
+// =====================================================================
+function updateAuthUI() {
+  const avatarBtn = document.getElementById('userAvatarBtn');
+  if (currentUserProfile) {
+    const initials = ((currentUserProfile.name||'')[0]||'') + ((currentUserProfile.lastName||'')[0]||'');
+    avatarBtn.innerHTML = initials
+      ? `<span>${initials.toUpperCase()}</span>`
+      : `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    avatarBtn.classList.add('logged-in');
+    document.getElementById('userDropdownName').textContent  = `${currentUserProfile.name} ${currentUserProfile.lastName}`;
+    document.getElementById('userDropdownEmail').textContent = currentUserProfile.phone || '—';
+  } else {
+    avatarBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    avatarBtn.classList.remove('logged-in');
+    document.getElementById('userDropdownName').textContent  = '—';
+    document.getElementById('userDropdownEmail').textContent = '—';
+  }
+}
+
+document.getElementById('userBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  if (currentUserProfile) {
+    document.getElementById('userDropdown').classList.toggle('open');
+  } else {
+    openAuthModal('login');
+  }
+});
+document.addEventListener('click', e => { if (!e.target.closest('#userDropdownWrap')) document.getElementById('userDropdown').classList.remove('open'); });
+
+document.getElementById('signOutBtn').addEventListener('click', () => {
+  currentUserProfile = null;
+  clearSession();
+  updateAuthUI();
+  document.getElementById('userDropdown').classList.remove('open');
+  showToast('U dol nga llogaria');
+});
+
+// =====================================================================
+// AUTH MODAL
+// =====================================================================
+function openAuthModal(tab = 'login', fromOrder = false) {
+  _authFromOrderModal = fromOrder;
+  switchAuthTab(tab);
+  clearAuthErrors();
+  document.getElementById('authGlobalError').classList.remove('show');
+  document.getElementById('authSuccessMsg').classList.remove('show');
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+
+window.switchAuthTab = function(tab) {
+  document.getElementById('authLoginForm').style.display  = tab==='login'  ? 'block' : 'none';
+  document.getElementById('authSignupForm').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active',  tab==='login');
+  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  clearAuthErrors();
+  document.getElementById('authGlobalError').classList.remove('show');
+  document.getElementById('authSuccessMsg').classList.remove('show');
+};
+
+document.getElementById('authModalClose').addEventListener('click', closeAuthModal);
+document.getElementById('authModal').addEventListener('click', e => { if (e.target===document.getElementById('authModal')) closeAuthModal(); });
+
+document.getElementById('gateLoginBtn').addEventListener('click',  () => { closeOrderModal(); openAuthModal('login',  true); });
+document.getElementById('gateSignupBtn').addEventListener('click', () => { closeOrderModal(); openAuthModal('signup', true); });
+
+function clearAuthErrors() {
+  ['errLoginName','errLoginLastName','errLoginPhone','errSignupName','errSignupLastName','errSignupPhone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('show'); el.textContent = ''; }
+  });
+}
+function showAuthError(id, msg)   { const el=document.getElementById(id); if(el){ el.textContent=msg; el.classList.add('show'); } }
+function showAuthGlobalError(msg) { const el=document.getElementById('authGlobalError'); el.textContent=msg; el.classList.add('show'); }
+function showAuthSuccess(msg)     { const el=document.getElementById('authSuccessMsg');  el.textContent=msg; el.classList.add('show'); }
+
+// =====================================================================
+// LOGIN — FIXED
+// Normalises phone to +355... format before looking up Firestore
+// =====================================================================
+window.doLogin = async function() {
+  clearAuthErrors();
+  document.getElementById('authGlobalError').classList.remove('show');
+  document.getElementById('authSuccessMsg').classList.remove('show');
+
+  const name  = document.getElementById('loginName').value.trim();
+  const last  = document.getElementById('loginLastName').value.trim();
+  const rawPhone = document.getElementById('loginPhone').value.trim();
+
+  let valid = true;
+  if (!name) { showAuthError('errLoginName', 'Emri është i detyrueshëm'); valid = false; }
+  if (!last) { showAuthError('errLoginLastName', 'Mbiemri është i detyrueshëm'); valid = false; }
+  if (!rawPhone || !isValidPhone(rawPhone)) { showAuthError('errLoginPhone', t('errPhone')); valid = false; }
+  if (!valid) return;
+
+  // Convert to +355 format for Firestore lookup
+  const phone = normalisePhone(rawPhone);
+
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Duke kërkuar...';
+
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    let foundDoc = null;
+
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
+      // Normalise stored phone too, in case of inconsistencies
+      const storedPhone = normalisePhone(d.phone || '');
+      if (
+        d.name?.toLowerCase()     === name.toLowerCase() &&
+        d.lastName?.toLowerCase() === last.toLowerCase() &&
+        storedPhone               === phone
+      ) {
+        foundDoc = { uid: docSnap.id, ...d };
+      }
+    });
+
+    if (!foundDoc) {
+      showAuthGlobalError('Nuk u gjet asnjë llogari me këto të dhëna. Kontrolloni emrin, mbiemrin dhe numrin e telefonit.');
+      btn.disabled = false; btn.textContent = 'Hyr në llogari';
+      return;
+    }
+
+    currentUserProfile = { uid: foundDoc.uid, name: foundDoc.name, lastName: foundDoc.lastName, phone: foundDoc.phone };
+    setSession(currentUserProfile);
+    updateAuthUI();
+    closeAuthModal();
+    showToast(`Mirë se erdhe, ${foundDoc.name}! 👋`);
+
+    if (_authFromOrderModal) {
+      _authFromOrderModal = false;
+      document.getElementById('orderModal').classList.add('open');
+      updateOrderModalForAuthState();
+    }
+  } catch(e) {
+    console.error('Login error:', e);
+    showAuthGlobalError('Gabim gjatë hyrjes. Kontrolloni lidhjen me internetin dhe provoni sërish.');
+  }
+
+  btn.disabled = false; btn.textContent = 'Hyr në llogari';
+};
+
+// =====================================================================
+// SIGN UP — FIXED
+// Normalises phone to +355... format before writing to Firestore
+// =====================================================================
+window.doSignup = async function() {
+  clearAuthErrors();
+  document.getElementById('authGlobalError').classList.remove('show');
+  document.getElementById('authSuccessMsg').classList.remove('show');
+
+  const name     = document.getElementById('signupName').value.trim();
+  const last     = document.getElementById('signupLastName').value.trim();
+  const rawPhone = document.getElementById('signupPhone').value.trim();
+
+  let valid = true;
+  if (!name) { showAuthError('errSignupName', 'Emri është i detyrueshëm'); valid = false; }
+  if (!last) { showAuthError('errSignupLastName', 'Mbiemri është i detyrueshëm'); valid = false; }
+  if (!rawPhone || !isValidPhone(rawPhone)) { showAuthError('errSignupPhone', t('errPhone')); valid = false; }
+  if (!valid) return;
+
+  // Normalise to +355 format — this is what will be stored
+  const phone = normalisePhone(rawPhone);
+
+  const btn = document.getElementById('signupSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Duke krijuar...';
+
+  try {
+    // Check if phone already registered (compare normalised)
+    const snap = await getDocs(collection(db, 'users'));
+    let alreadyExists = false;
+    snap.forEach(docSnap => {
+      if (normalisePhone(docSnap.data().phone || '') === phone) alreadyExists = true;
+    });
+
+    if (alreadyExists) {
+      showAuthGlobalError('Ky numër telefoni është tashmë i regjistruar. Provoni të hyni.');
+      btn.disabled = false; btn.textContent = 'Krijo llogari';
+      return;
+    }
+
+    // Write to Firestore — phone stored as +355XXXXXXXXX
+    const newDocRef = await addDoc(collection(db, 'users'), {
+      name,
+      lastName: last,
+      phone,          // stored as +355XXXXXXXXX
+      createdAt: serverTimestamp()
+    });
+
+    currentUserProfile = { uid: newDocRef.id, name, lastName: last, phone };
+    setSession(currentUserProfile);
+    updateAuthUI();
+
+    showAuthSuccess('Llogaria u krijua me sukses! 🎉');
+    setTimeout(() => {
+      closeAuthModal();
+      showToast(`Mirë se vjen, ${name}! 🎉`);
+      if (_authFromOrderModal) {
+        _authFromOrderModal = false;
+        document.getElementById('orderModal').classList.add('open');
+        updateOrderModalForAuthState();
+      }
+    }, 1200);
+
+  } catch(e) {
+    console.error('Signup error:', e);
+    showAuthGlobalError('Gabim gjatë regjistrimit. Kontrolloni lidhjen me internetin dhe provoni sërish.');
+  }
+
+  btn.disabled = false; btn.textContent = 'Krijo llogari';
+};
+
+// Enter key support
+document.getElementById('loginPhone').addEventListener('keydown',  e => { if(e.key==='Enter') window.doLogin(); });
+document.getElementById('signupPhone').addEventListener('keydown', e => { if(e.key==='Enter') window.doSignup(); });
+
+updateAuthUI();
+
+// =====================================================================
+// LANGUAGE
+// =====================================================================
+window.setLang = function(lang) {
+  currentLang = lang;
+  localStorage.setItem('fo_lang', lang);
+  ['sq','en','it','de','fr','el','tr','ar'].forEach(id => {
+    const el = document.getElementById('lang' + id.charAt(0).toUpperCase() + id.slice(1));
+    if (el) el.classList.toggle('active', id===lang);
+  });
+  applyTranslations();
+  renderProducts(currentCat);
+  renderCart();
+};
+
+function applyTranslations() {
+  document.getElementById('searchInput').placeholder = t('search');
+  document.getElementById('menuSearchInput').placeholder = t('menuSearch');
+  document.getElementById('offersTitle').textContent = t('offers');
+  document.getElementById('menuAllLabel').textContent = t('allCat');
+  document.getElementById('menuSectionLabel').textContent = t('menuCategories');
+  document.getElementById('sectionTitle').textContent = currentCat==='all' ? t('allProducts') : currentCat;
+  document.getElementById('backText').textContent = t('back');
+  document.getElementById('addToCartText').textContent = t('addToCart');
+  document.getElementById('cartTitle').textContent = t('cartTitle');
+  document.getElementById('cartTotalLabel').textContent = t('total');
+  document.getElementById('checkoutText').textContent = t('checkout');
+  document.getElementById('orderTitle').textContent = t('orderTitle');
+  document.getElementById('labelAdresa').textContent = t('adresa');
+  document.getElementById('labelShenime').textContent = t('shenime');
+  const pn = document.getElementById('paymentNote'); if(pn) pn.textContent = t('payNote');
+  const po = document.getElementById('placeOrderText'); if(po) po.textContent = t('confirm');
+  document.getElementById('settingsLabel').textContent = t('settings');
+  document.getElementById('themeLabel').textContent = t('theme');
+  document.getElementById('darkModeLabel').textContent = t('darkMode');
+  document.getElementById('langLabel').textContent = t('language');
+  document.getElementById('footerTagline').textContent = t('footerTag');
+  document.getElementById('footerLocH').textContent = t('footerLoc');
+  document.getElementById('footerContactH').textContent = t('footerContact');
+  document.getElementById('footerInstH').textContent = t('footerInst');
+  document.getElementById('footerCopy').textContent = t('footerCopy');
+  document.getElementById('chipClear').textContent = t('chipClear');
+  document.getElementById('offerBackText').textContent = t('back');
+  document.getElementById('offerProductsTitle').textContent = t('offerProducts');
+  document.getElementById('offerAddAllText').textContent = t('addAllToCart');
+}
+
+// =====================================================================
+// DARK MODE
+// =====================================================================
+const savedTheme = localStorage.getItem('fo_theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('darkToggle').classList.toggle('on', savedTheme==='dark');
+
+window.toggleDark = function() {
+  const next = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('fo_theme', next);
+  document.getElementById('darkToggle').classList.toggle('on', next==='dark');
+};
+
+// =====================================================================
+// SETTINGS PANEL
+// =====================================================================
+document.getElementById('settingsBtn').addEventListener('click', () => { document.getElementById('settingsPanel').classList.add('open'); document.getElementById('settingsOverlay').classList.add('open'); });
+window.closeSettings = function() { document.getElementById('settingsPanel').classList.remove('open'); document.getElementById('settingsOverlay').classList.remove('open'); };
+
+// =====================================================================
+// LOAD PRODUCTS
+// =====================================================================
+async function loadProducts() {
+  try {
+    const snap = await getDocs(collection(db, 'sample'));
+    products = [];
+    snap.forEach(d => products.push({ id: d.id, ...d.data() }));
+    buildMenuCategories();
+    renderProducts('all');
+  } catch(e) {
+    console.error('Error loading products:', e);
+    document.getElementById('productsGrid').innerHTML = `<p style="color:var(--text-muted);padding:20px;">${t('noProducts')}</p>`;
+  }
+}
+
+function buildMenuCategories() {
+  const catCounts = {};
+  products.forEach(p => {
+    const c = p.category || p.kategoria;
+    if (c) { (Array.isArray(c) ? c : [c]).forEach(cat => { catCounts[cat] = (catCounts[cat]||0) + 1; }); }
+  });
+  document.getElementById('menuAllCount').textContent = products.length;
+  const list = document.getElementById('menuCategoriesList');
+  list.querySelectorAll('.menu-cat-btn:not(#menuAllBtn), .menu-cat-divider').forEach(b => b.remove());
+  const divider = document.createElement('div');
+  divider.className = 'menu-cat-divider'; divider.id = 'menu-cat-divider';
+  list.appendChild(divider);
+  Object.entries(catCounts).sort((a,b) => b[1]-a[1]).forEach(([cat, count]) => {
+    const btn = document.createElement('button');
+    btn.className = 'menu-cat-btn'; btn.dataset.cat = cat;
+    btn.innerHTML = `<span class="cat-icon"></span><span class="cat-label">${cat}</span><span class="menu-cat-count">${count}</span>`;
+    btn.addEventListener('click', () => { filterByCategory(cat); closeMenu(); });
+    list.appendChild(btn);
+  });
+}
+
+function filterByCategory(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.menu-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat===cat));
+  document.getElementById('sectionTitle').textContent = cat==='all' ? t('allProducts') : cat;
+  updateChip(cat);
+  renderProducts(cat);
+}
+document.getElementById('menuAllBtn').addEventListener('click', () => { filterByCategory('all'); closeMenu(); });
+
+function getEffectivePrice(p) {
+  const base = parseFloat(p.price || p.cmimi || 0);
+  const disc = parseFloat(p.discount || p.zbritje || 0);
+  return disc>0 ? base - (base*disc/100) : base;
+}
+
+function renderProducts(catFilter) {
+  const grid = document.getElementById('productsGrid');
+  let filtered = products;
+  if (catFilter && catFilter!=='all') {
+    filtered = products.filter(p => {
+      const c = p.category || p.kategoria;
+      return Array.isArray(c) ? c.includes(catFilter) : c===catFilter;
+    });
+  }
+  if (!filtered.length) { grid.innerHTML=`<div class="section-loading"><div class="spinner"></div><p>${t('noProducts')}</p></div>`; return; }
+  grid.innerHTML = filtered.map(p => {
+    const base   = parseFloat(p.price||p.cmimi||0);
+    const disc   = parseFloat(p.discount||p.zbritje||0);
+    const eff    = disc>0 ? base-(base*disc/100) : base;
+    const isOOS  = (p.status||p.statusi)==='out_of_stock' || (p.status||p.statusi)==='Jashtë stokut';
+    const cats   = Array.isArray(p.category||p.kategoria) ? (p.category||p.kategoria).join(', ') : (p.category||p.kategoria||'');
+    return `<div class="product-card" onclick="openProduct('${p.id}')">
+      <div class="product-img-wrap">
+        <img src="${p.image||p.imazhi||'https://via.placeholder.com/300x300?text=No+Image'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>
+        ${disc>0?`<span class="product-badge">-${disc}%</span>`:''}
+        ${isOOS?`<div class="out-of-stock-overlay">${t('outOfStock')}</div>`:''}
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name||p.emri}</div>
+        ${cats?`<div class="product-cat">${cats}</div>`:''}
+        <div class="product-pricing">
+          ${disc>0?`<span class="product-price-original">${base} Lekë</span><span class="product-price-discounted">${Math.round(eff)} Lekë</span>`:`<span class="product-price">${base} Lekë</span>`}
+        </div>
+        <button class="add-to-cart-btn" ${isOOS?'disabled':''} onclick="event.stopPropagation(); addToCart('${p.id}')">
+          ${isOOS?t('outOfStock'):t('addToCart')}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// =====================================================================
+// PRODUCT DETAIL
+// =====================================================================
+window.openProduct = function(id) {
+  const p = products.find(x => x.id===id); if (!p) return;
+  const base  = parseFloat(p.price||p.cmimi||0);
+  const disc  = parseFloat(p.discount||p.zbritje||0);
+  const eff   = disc>0 ? base-(base*disc/100) : base;
+  const isOOS = (p.status||p.statusi)==='out_of_stock';
+  const cats  = Array.isArray(p.category||p.kategoria) ? (p.category||p.kategoria).join(', ') : (p.category||p.kategoria||'');
+  document.getElementById('detailImg').src = p.image||p.imazhi||'https://via.placeholder.com/400x400?text=No+Image';
+  document.getElementById('detailImg').alt = p.name||p.emri;
+  document.getElementById('detailName').textContent = p.name||p.emri;
+  document.getElementById('detailCat').textContent  = cats;
+  document.getElementById('detailDesc').textContent = p.description||p.pershkrimi||'';
+  document.getElementById('detailSasia').textContent = p.sasia ? `${t('sasia')} ${p.sasia}` : '';
+  if (disc>0) {
+    document.getElementById('detailPrice').textContent = `${Math.round(eff)} Lekë`;
+    document.getElementById('detailPrice').classList.add('discounted');
+    document.getElementById('detailOriginal').textContent = `${base} Lekë`;
+    document.getElementById('detailOriginal').style.display='';
+  } else {
+    document.getElementById('detailPrice').textContent = `${base} Lekë`;
+    document.getElementById('detailPrice').classList.remove('discounted');
+    document.getElementById('detailOriginal').style.display='none';
+  }
+  const addBtn = document.getElementById('detailAddBtn');
+  addBtn.disabled = isOOS;
+  document.getElementById('addToCartText').textContent = isOOS?t('outOfStock'):t('addToCart');
+  addBtn.onclick = () => addToCart(id);
+  document.getElementById('home-page').style.display    = 'none';
+  document.getElementById('product-page').style.display = 'block';
+  document.getElementById('offer-page').style.display   = 'none';
+  window.scrollTo(0,0);
+};
+
+window.showHome = function(e) {
+  if (e) e.preventDefault();
+  clearInterval(offerTimerInterval);
+  document.getElementById('home-page').style.display    = 'block';
+  document.getElementById('product-page').style.display = 'none';
+  document.getElementById('offer-page').style.display   = 'none';
+};
+
+// =====================================================================
+// OFFER DETAIL
+// =====================================================================
+function isOfferExpired(o) {
+  if (!o.expiresAt) return false;
+  const exp = o.expiresAt.toDate ? o.expiresAt.toDate() : new Date(o.expiresAt);
+  return Date.now() > exp.getTime();
+}
+
+window.openOffer = function(offerId) {
+  const o = offers.find(x => x.id===offerId);
+  if (!o || isOfferExpired(o)) return;
+  document.getElementById('offerDetailTag').textContent   = o.tag||'Ofertë';
+  document.getElementById('offerDetailTitle').textContent = o.title||o.titull||'';
+  document.getElementById('offerDetailDesc').textContent  = o.description||o.pershkrimi||'';
+  document.getElementById('offerBackText').textContent    = t('back');
+  document.getElementById('offerAddAllText').textContent  = t('addAllToCart');
+  document.getElementById('offerProductsTitle').textContent = t('offerProducts');
+  const heroBg = document.getElementById('offerHeroBg');
+  const offerImage = o.image||o.imazhi||'';
+  if (offerImage) { heroBg.style.backgroundImage=`url('${offerImage}')`; heroBg.style.backgroundSize='cover'; heroBg.style.backgroundPosition='center'; }
+  else { heroBg.style.backgroundImage='none'; heroBg.style.background='linear-gradient(135deg,#1e3349,#2F4F73)'; }
+  const offerProductIds = Array.isArray(o.productIds) ? o.productIds : [];
+  const offerProducts   = offerProductIds.map(id => products.find(p => p.id===id)).filter(Boolean);
+  const origTotal = offerProducts.reduce((s,p) => s+parseFloat(p.price||p.cmimi||0), 0);
+  const discPct   = parseFloat(o.discountPct||0);
+  const newTotal  = discPct>0 ? Math.round(origTotal*(1-discPct/100)) : origTotal;
+  const origEl    = document.getElementById('offerDetailOriginalPrice');
+  const newEl     = document.getElementById('offerDetailNewPrice');
+  const badgeEl   = document.getElementById('offerDetailDiscBadge');
+  if (discPct>0 && origTotal>0) { origEl.textContent=`${Math.round(origTotal)} Lekë`; origEl.style.display=''; newEl.textContent=`${newTotal} Lekë`; badgeEl.textContent=`-${discPct}%`; badgeEl.style.display=''; }
+  else if (origTotal>0) { origEl.style.display='none'; newEl.textContent=`${Math.round(origTotal)} Lekë`; badgeEl.style.display='none'; }
+  else { origEl.style.display='none'; newEl.textContent=''; badgeEl.style.display='none'; }
+  clearInterval(offerTimerInterval);
+  const timerRow = document.getElementById('offerDetailTimerRow');
+  if (o.expiresAt) {
+    timerRow.style.display='inline-flex';
+    const exp = o.expiresAt.toDate ? o.expiresAt.toDate() : new Date(o.expiresAt);
+    function updateCountdown() {
+      const diff = exp.getTime()-Date.now();
+      if (diff<=0) { clearInterval(offerTimerInterval); document.getElementById('offerTimerCountdown').textContent='Ka mbaruar'; document.getElementById('offerAddAllBtn').disabled=true; return; }
+      const d=Math.floor(diff/86400000); const h=Math.floor((diff%86400000)/3600000); const m=Math.floor((diff%3600000)/60000); const s=Math.floor((diff%60000)/1000);
+      let str=''; if(d>0) str+=`${d}d `; str+=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      document.getElementById('offerTimerCountdown').textContent=str;
+    }
+    updateCountdown(); offerTimerInterval=setInterval(updateCountdown,1000);
+  } else { timerRow.style.display='none'; }
+  const addAllBtn = document.getElementById('offerAddAllBtn');
+  addAllBtn.disabled = offerProducts.length===0;
+  addAllBtn.onclick = () => {
+    if (!offerProducts.length) return;
+    offerProducts.forEach(p => {
+      const base=parseFloat(p.price||p.cmimi||0);
+      const offerPrice=discPct>0?Math.round(base*(1-discPct/100)):base;
+      const existing=cart.find(i=>i.id===p.id);
+      if (existing) existing.qty++; else cart.push({id:p.id,name:p.name||p.emri,price:offerPrice,origPrice:base,image:p.image||p.imazhi||'',qty:1});
+    });
+    saveCart(); updateCartBadge(); renderCart(); showToast(t('offerAdded'));
+  };
+  const grid = document.getElementById('offerProductsGrid');
+  grid.innerHTML = offerProducts.length===0 ? `<p style="color:var(--text-muted);padding:20px;">${t('noProducts')}</p>` :
+    offerProducts.map(p => {
+      const base=parseFloat(p.price||p.cmimi||0);
+      const cats=Array.isArray(p.category||p.kategoria)?(p.category||p.kategoria).join(', '):(p.category||p.kategoria||'');
+      const isOOS=(p.status||p.statusi)==='out_of_stock';
+      return `<div class="product-card" onclick="openProduct('${p.id}')">
+        <div class="product-img-wrap"><img src="${p.image||p.imazhi||'https://via.placeholder.com/300x300?text=No+Image'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>${isOOS?`<div class="out-of-stock-overlay">${t('outOfStock')}</div>`:''}</div>
+        <div class="product-info"><div class="product-name">${p.name||p.emri}</div>${cats?`<div class="product-cat">${cats}</div>`:''}<div class="product-pricing"><span class="product-price">${base} Lekë</span></div>
+        <button class="add-to-cart-btn" ${isOOS?'disabled':''} onclick="event.stopPropagation(); addToCart('${p.id}')">${isOOS?t('outOfStock'):t('addToCart')}</button></div></div>`;
+    }).join('');
+  document.getElementById('home-page').style.display    = 'none';
+  document.getElementById('product-page').style.display = 'none';
+  document.getElementById('offer-page').style.display   = 'block';
+  window.scrollTo(0,0);
+};
+
+document.getElementById('offerBackBtn').addEventListener('click', () => {
+  clearInterval(offerTimerInterval);
+  document.getElementById('offer-page').style.display = 'none';
+  document.getElementById('home-page').style.display  = 'block';
+});
+
+// =====================================================================
+// CART
+// =====================================================================
+window.addToCart = function(id) {
+  const p = products.find(x => x.id===id); if (!p) return;
+  const existing = cart.find(i => i.id===id);
+  if (existing) existing.qty++;
+  else { const eff=getEffectivePrice(p); cart.push({id,name:p.name||p.emri,price:eff,origPrice:parseFloat(p.price||p.cmimi||0),image:p.image||p.imazhi||'',qty:1}); }
+  saveCart(); updateCartBadge(); renderCart();
+  showToast(t('addToCart') + ' ✓');
+};
+function saveCart() { localStorage.setItem('fo_cart', JSON.stringify(cart)); }
+function updateCartBadge() {
+  const badge = document.getElementById('cartBadge');
+  const total = cart.reduce((s,i) => s+i.qty, 0);
+  badge.textContent = total; badge.style.display = total>0?'flex':'none';
+  if (total>0) { badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
+}
+window.openCart  = function() { document.getElementById('cartDrawer').classList.add('open');    document.getElementById('cartOverlay').classList.add('open'); };
+window.closeCart = function() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); };
+document.getElementById('cartBtn').addEventListener('click', openCart);
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const footer    = document.getElementById('cartFooter');
+  if (!cart.length) {
+    container.innerHTML = `<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><p>${t('cartEmpty')}</p></div>`;
+    footer.style.display='none'; return;
+  }
+  footer.style.display='block';
+  let total=0;
+  container.innerHTML = cart.map(item => {
+    total += item.price*item.qty;
+    return `<div class="cart-item">
+      <img class="cart-item-img" src="${item.image||'https://via.placeholder.com/54x54'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/54x54'"/>
+      <div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${Math.round(item.price)} Lekë × ${item.qty}</div></div>
+      <div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div>
+      <span class="remove-btn" onclick="removeItem('${item.id}')" title="${t('remove')}">✕</span>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent = `${Math.round(total)} Lekë`;
+}
+window.changeQty  = function(id, delta) { const item=cart.find(i=>i.id===id); if(!item) return; item.qty+=delta; if(item.qty<=0) cart=cart.filter(i=>i.id!==id); saveCart(); updateCartBadge(); renderCart(); };
+window.removeItem = function(id) { cart=cart.filter(i=>i.id!==id); saveCart(); updateCartBadge(); renderCart(); };
+
+// =====================================================================
+// ORDER MODAL
+// =====================================================================
+function updateOrderModalForAuthState() {
+  const gate = document.getElementById('orderAuthGate');
+  const form = document.getElementById('orderLoggedInForm');
+  if (currentUserProfile) {
+    gate.style.display='none'; form.style.display='block';
+    document.getElementById('orderUserName').textContent  = `${currentUserProfile.name} ${currentUserProfile.lastName}`;
+    document.getElementById('orderUserPhone').textContent = currentUserProfile.phone||'—';
+  } else {
+    gate.style.display='block'; form.style.display='none';
+  }
+}
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  closeCart();
+  updateOrderModalForAuthState();
+  document.getElementById('orderModal').classList.add('open');
+});
+window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('open'); };
+
+document.getElementById('geoLocBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) { showToast('Gjeolokacioni nuk mbështetet nga shfletuesi juaj'); return; }
+  const btn = document.getElementById('geoLocBtn'); btn.style.opacity='0.5';
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const {latitude:lat, longitude:lon} = pos.coords;
+      try {
+        const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+        const data = await res.json();
+        document.getElementById('locationSearch').value = data.display_name||`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      } catch { document.getElementById('locationSearch').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`; }
+      btn.style.opacity='1';
+    },
+    () => { btn.style.opacity='1'; showToast('Nuk mund të merret vendndodhja. Lejojeni aksesin dhe provoni sërish.'); },
+    { timeout:8000 }
+  );
+});
+
+function validateOrder() {
+  let valid=true;
+  const errLoc  = document.getElementById('errLocation');
+  const locInput= document.getElementById('locationSearch');
+  if(errLoc)  errLoc.classList.remove('show');
+  if(locInput) locInput.classList.remove('error');
+  if (!locInput||!locInput.value.trim()) {
+    if(errLoc)  { errLoc.textContent=t('errAddr'); errLoc.classList.add('show'); }
+    if(locInput) locInput.classList.add('error');
+    valid=false;
+  }
+  return valid;
+}
+
+document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+  if (!validateOrder()) return;
+  if (!currentUserProfile) { showToast('Ju lutem hyni së pari!'); return; }
+  const btn = document.getElementById('placeOrderBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div>';
+  const {name, lastName:last, phone} = currentUserProfile;
+  const addr  = document.getElementById('locationSearch').value.trim();
+  const notes = document.getElementById('orderNotes').value.trim();
+  const total = cart.reduce((s,i) => s+i.price*i.qty, 0);
+  const items = cart.map(i=>`${i.name} x${i.qty} @ ${Math.round(i.price)} Lekë`).join('\n');
+  try {
+    await addDoc(collection(db,'orders'), {
+      buyerName:name, buyerLastName:last, buyerPhone:phone, address:addr,
+      notes, items, total:`${Math.round(total)} Lekë`,
+      date:new Date().toLocaleString('sq-AL'), status:'pending',
+      userId: currentUserProfile.uid,
+      createdAt:serverTimestamp()
+    });
+    await emailjs.send("service_zaexc1f","template_jw8fadu",{
+      to_email:"farmaciorien@gmail.com", buyerName:name+' '+last,
+      buyerPhone:phone, address:addr, items, total:`${Math.round(total)} Lekë`,
+      notes:notes||'-', date:new Date().toLocaleString('sq-AL')
+    });
+    cart=[]; saveCart(); updateCartBadge(); renderCart();
+    closeOrderModal();
+    document.getElementById('locationSearch').value='';
+    document.getElementById('orderNotes').value='';
+    showSuccess(t('success'));
+  } catch(e) {
+    console.error('Order error:',e); showToast('Gabim! Ju lutemi provoni sërish.');
+  }
+  btn.disabled=false; btn.innerHTML=`<span id="placeOrderText">${t('confirm')}</span>`;
+});
+
+function showSuccess(msg) { const p=document.getElementById('successPopup'); document.getElementById('successMsg').textContent=msg; p.classList.add('show'); setTimeout(()=>p.classList.remove('show'),5000); }
+window.showToast = function(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2500); };
+
+// =====================================================================
+// SEARCH
+// =====================================================================
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q    = this.value.trim().toLowerCase();
+  const drop = document.getElementById('searchDropdown');
+  if (!q) { drop.classList.remove('active'); drop.innerHTML=''; return; }
+  const results = products.filter(p => {
+    const name = (p.name||p.emri||'').toLowerCase();
+    const desc = (p.description||p.pershkrimi||'').toLowerCase();
+    const tags = Array.isArray(p.tags)?p.tags.join(' ').toLowerCase():(p.tags||'').toLowerCase();
+    return name.includes(q)||desc.includes(q)||tags.includes(q);
+  }).slice(0,8);
+  if (!results.length) { drop.innerHTML=`<div class="search-no-result">${t('noProducts')}</div>`; drop.classList.add('active'); return; }
+  drop.innerHTML = results.map(p => {
+    const eff=getEffectivePrice(p);
+    return `<div class="search-result-item" onclick="openProduct('${p.id}'); document.getElementById('searchDropdown').classList.remove('active'); document.getElementById('searchInput').value=''; document.getElementById('searchExpandWrap').classList.remove('open'); document.getElementById('searchToggleBtn').classList.remove('open');">
+      <img class="search-result-img" src="${p.image||p.imazhi||'https://via.placeholder.com/42'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/42'"/>
+      <div class="search-result-info"><div class="name">${p.name||p.emri}</div><div class="price">${Math.round(eff)} Lekë</div></div>
+    </div>`;
+  }).join('');
+  drop.classList.add('active');
+});
+
+// =====================================================================
+// OFFERS SLIDER
+// =====================================================================
+const sliderColors=['linear-gradient(135deg,#2F4F73,#3d6491)','linear-gradient(135deg,#C5302E,#e04442)','linear-gradient(135deg,#1a3a5c,#2F4F73)','linear-gradient(135deg,#2e7d32,#43a047)','linear-gradient(135deg,#4527a0,#7c4dff)'];
+
+async function loadOffers() {
+  try {
+    const snap = await getDocs(collection(db,'offers'));
+    offers=[]; snap.forEach(d=>offers.push({id:d.id,...d.data()}));
+    renderSlider();
+  } catch(e) { console.log('Offers error:',e); renderSlider(); }
+}
+
+function renderSlider() {
+  const track = document.getElementById('sliderTrack');
+  const dots  = document.getElementById('sliderDots');
+  const valid = offers.filter(o=>!isOfferExpired(o));
+  let slides;
+  if (valid.length>0) {
+    slides = valid.map((o,i) => ({id:o.id, title:o.title||o.titull||'Ofertë Speciale', desc:o.description||o.pershkrimi||'', tag:o.tag||'Ofertë', image:o.image||o.imazhi||'', bg:sliderColors[i%sliderColors.length], isOffer:true, expired:false}));
+  } else {
+    slides = [{title:'Farmaci Orien', desc:'Farmacia juaj e besuar. Shërbim me cilësi, çmime të arsyeshme.', tag:'Mirë se vini', bg:sliderColors[0], image:'', isOffer:false}];
+  }
+  track.innerHTML = slides.map(s => {
+    const clickable = s.isOffer && !s.expired;
+    const styleAttr = s.image ? `style="background:#111;"` : `style="background:${s.bg}"`;
+    return `<div class="slide${clickable?' offer-slide-link':''}" ${styleAttr}${clickable?` onclick="openOffer('${s.id}')"`:''}>${s.image?`<img class="slide-bg-img" src="${s.image}" alt="${s.title}" onerror="this.style.display='none';this.parentElement.style.background='${s.bg}'">`:''}
+      <div class="slide-overlay"></div>
+      <div class="slide-content"><div class="slide-tag">${s.tag}</div><div class="slide-title">${s.title}</div><div class="slide-desc">${s.desc}</div>${clickable?`<button class="offer-btn">Shiko Ofertën →</button>`:''}</div>
+    </div>`;
+  }).join('');
+  dots.innerHTML = slides.map((_,i)=>`<button class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></button>`).join('');
+  startSlider(slides.length);
+}
+
+function startSlider(count) {
+  slideCount=count; clearInterval(sliderTimer);
+  if (count>1) sliderTimer=setInterval(()=>goToSlide((sliderIndex+1)%slideCount),5000);
+}
+window.goToSlide = function(idx) {
+  sliderIndex=idx;
+  document.getElementById('sliderTrack').style.transform=`translateX(-${idx*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+};
+document.getElementById('sliderPrev').addEventListener('click', ()=>goToSlide((sliderIndex-1+slideCount)%slideCount));
+document.getElementById('sliderNext').addEventListener('click', ()=>goToSlide((sliderIndex+1)%slideCount));
+
+// =====================================================================
+// INIT
+// =====================================================================
+applyTranslations();
+updateCartBadge();
+renderCart();
+loadProducts();
+loadOffers();
+setLang(currentLang);
+</script>
+</body>
+</html>

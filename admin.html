@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Farmaci Orien</title>
+  <link rel="stylesheet" href="admin.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo" style="display:flex;align-items:baseline;gap:5px;justify-content:center">
+        <span class="logo-left" style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.8rem;letter-spacing:2px;color:#e2ecf7;">FARMACI</span>
+        <span class="logo-right" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:1.25rem;color:#e05c5a;font-style:italic;">Orien</span>
+      </div>
+    </div>
+    <p class="login-title">ADMIN PANEL — HYRJA</p>
+    <input type="text" class="login-input" id="loginUser" placeholder="Përdoruesi"/>
+    <input type="password" class="login-input" id="loginPass" placeholder="Fjalëkalimi"/>
+    <button class="login-btn" onclick="doLogin()">Hyr si Admin</button>
+    <p class="login-error" id="loginError">Kredenciale të gabuara. Provoni sërish.</p>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-panel">
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo" style="display:flex;align-items:baseline;gap:5px;">
+          <span class="logo-left" style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.4rem;letter-spacing:2px;color:#e2ecf7;">FARMACI</span>
+          <span class="logo-right" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:1rem;color:#e05c5a;font-style:italic;">Orien</span>
+        </div>
+        <div class="sidebar-admin-badge">Admin Panel</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="showSection('orders', this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Porositë
+        </button>
+        <button class="nav-item" onclick="showSection('inventory', this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Inventari
+        </button>
+        <button class="nav-item" onclick="showSection('offers', this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Ofertat & Uljet
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Dil nga Paneli
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <span class="topbar-title" id="topbarTitle">Porositë</span>
+        <div class="topbar-search">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="topbarSearch" placeholder="Kërko..."/>
+        </div>
+      </div>
+      <div class="admin-content">
+
+        <!-- ORDERS SECTION -->
+        <div id="section-orders">
+          <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+              <div class="stat-icon blue"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+              <div class="stat-info"><div class="val" id="statTotal">0</div><div class="label">Porosi Gjithsej</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="stat-info"><div class="val" id="statPending">0</div><div class="label">Në Pritje</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="stat-info"><div class="val" id="statComplete">0</div><div class="label">Të Kryera</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+              <div class="stat-info"><div class="val" id="statProducts">0</div><div class="label">Produkte</div></div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Të gjitha Porositë</h3>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <!-- STATUS FILTER BUTTONS -->
+                <div class="order-filter-btns">
+                  <button class="order-filter-btn active" data-filter="all" onclick="setOrderFilter('all', this)">Të gjitha</button>
+                  <button class="order-filter-btn" data-filter="pending" onclick="setOrderFilter('pending', this)">Në Pritje</button>
+                  <button class="order-filter-btn" data-filter="complete" onclick="setOrderFilter('complete', this)">Të Kryera</button>
+                </div>
+                <div class="table-search">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <input type="text" id="orderSearch" placeholder="Kërko porosi..." oninput="filterOrders(this.value)"/>
+                </div>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr>
+                  <th>#</th>
+                  <th>Klienti</th>
+                  <th>Telefon</th>
+                  <th>Adresa</th>
+                  <th>Produktet</th>
+                  <th>Shënime</th>
+                  <th>Total</th>
+                  <th>Data</th>
+                  <th>Statusi</th>
+                  <th>Veprime</th>
+                </tr></thead>
+                <tbody id="ordersBody">
+                  <tr class="loading-row"><td colspan="10"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="ordersPagination"></div>
+          </div>
+        </div>
+
+        <!-- INVENTORY SECTION -->
+        <div id="section-inventory" style="display:none">
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Inventari i Produkteve</h3>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <div class="table-search">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <input type="text" id="productSearch" placeholder="Kërko produkt..." oninput="filterProducts(this.value)"/>
+                </div>
+                <button class="add-btn" onclick="openProductModal()">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Shto Produkt
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr>
+                  <th>Foto</th>
+                  <th>Emri</th>
+                  <th>Kategoria</th>
+                  <th>Çmimi</th>
+                  <th>Zbritja</th>
+                  <th>Çmimi Final</th>
+                  <th>Sasia</th>
+                  <th>Statusi</th>
+                  <th>Veprime</th>
+                </tr></thead>
+                <tbody id="productsBody">
+                  <tr class="loading-row"><td colspan="9"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="productsPagination"></div>
+          </div>
+        </div>
+
+        <!-- OFFERS SECTION -->
+        <div id="section-offers" style="display:none">
+          <!-- Discounts -->
+          <div class="table-card" style="margin-bottom:28px;">
+            <div class="table-header">
+              <h3>Uljet e Çmimeve</h3>
+              <div class="table-search">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="discountSearch" placeholder="Kërko produkt..." oninput="filterDiscounts(this.value)"/>
+              </div>
+            </div>
+            <div style="padding:16px;">
+              <div id="discountList">
+                <div style="text-align:center;padding:32px;color:var(--text-muted);">Duke u ngarkuar...</div>
+              </div>
+            </div>
+          </div>
+          <!-- Special Offers -->
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Ofertat Speciale (Slider)</h3>
+              <button class="add-btn" onclick="openOfferModal()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Shto Ofertë
+              </button>
+            </div>
+            <div style="padding:16px;">
+              <div class="offers-grid" id="offersGrid">
+                <div style="text-align:center;padding:32px;color:var(--text-muted);">Duke u ngarkuar...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRODUCT MODAL ===== -->
+<div class="admin-modal-overlay" id="productModal">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h3 id="productModalTitle">Shto Produkt të Ri</h3>
+      <button class="modal-close-btn" onclick="closeProductModal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="editProductId"/>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Emri i Produktit *</label>
+        <input type="text" id="add_name" placeholder="p.sh. Paracetamol 500mg"/>
+      </div>
+      <div class="form-group">
+        <label>Çmimi (Lek) *</label>
+        <input type="number" id="add_price" placeholder="p.sh. 250"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Sasia</label>
+        <input type="text" id="add_sasia" placeholder="p.sh. 20 tableta"/>
+      </div>
+      <div class="form-group">
+        <label>Statusi</label>
+        <select id="add_status">
+          <option value="available">E disponueshme</option>
+          <option value="out_of_stock">Jashtë stokut</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Kategorija (ndani me presje)</label>
+      <input type="text" id="add_category" placeholder="p.sh. Analgjezikë, Antiinflamatorë"/>
+    </div>
+    <div class="form-group">
+      <label>Lidhja e Fotos (URL)</label>
+      <input type="text" id="add_image" placeholder="https://..."/>
+    </div>
+    <div class="form-group">
+      <label>Përshkrimi</label>
+      <textarea id="add_pershkrimi" rows="3" placeholder="Përshkrimi i produktit..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (fjalë kyçe për kërkim)</label>
+      <input type="text" id="add_tags" placeholder="dhimbje koke, fever, ibuprofen, ilac"/>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeProductModal()">Anulo</button>
+      <button class="btn-save" id="saveProductBtn" onclick="saveProduct()">Ruaj Produktin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OFFER MODAL ===== -->
+<div class="admin-modal-overlay" id="offerModal">
+  <div class="admin-modal" style="max-width:680px;">
+    <div class="admin-modal-header">
+      <h3 id="offerModalTitle">Shto Ofertë të Re</h3>
+      <button class="modal-close-btn" onclick="closeOfferModal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="editOfferId"/>
+
+    <div class="form-group">
+      <label>Titulli *</label>
+      <input type="text" id="offer_title" placeholder="p.sh. Zbritje 20% në Vitamina"/>
+    </div>
+    <div class="form-group">
+      <label>Përshkrimi</label>
+      <textarea id="offer_desc" rows="3" placeholder="Detaje mbi ofertën..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tag / Etiketa</label>
+        <input type="text" id="offer_tag" placeholder="p.sh. Ofertë e Javës"/>
+      </div>
+      <div class="form-group">
+        <label>Foto (URL, opsionale)</label>
+        <input type="text" id="offer_image" placeholder="https://..."/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Produktet e Ofertës (zgjidhni një ose më shumë)</label>
+      <div class="offer-product-search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="offerProductSearch" placeholder="Kërko produkt për të shtuar..." oninput="filterOfferProductSearch(this.value)"/>
+      </div>
+      <div id="offerProductSearchResults"></div>
+      <div id="offerSelectedProducts" class="offer-selected-products"><span class="offer-no-selection">Asnjë produkt i zgjedhur</span></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Çmimi Total Origjinal (Lek)</label>
+        <input type="text" id="offer_original_price" placeholder="Automatik" readonly class="offer-readonly-input"/>
+      </div>
+      <div class="form-group">
+        <label>Zbritja % (opsionale)</label>
+        <input type="number" id="offer_discount_pct" min="0" max="99" placeholder="p.sh. 15" oninput="recalcOfferPrice()"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Çmimi i Ofertës (Lek)</label>
+      <input type="text" id="offer_final_price" placeholder="Automatik" readonly class="offer-readonly-input offer-final-price-input"/>
+    </div>
+
+    <div class="form-group">
+      <label>Kohëzgjatja e Ofertës (opsionale — lëreni bosh për manual)</label>
+      <div class="offer-timer-grid">
+        <div class="offer-timer-field">
+          <span class="offer-timer-label">Ditë</span>
+          <input type="number" id="offer_timer_days" min="0" placeholder="0"/>
+        </div>
+        <div class="offer-timer-field">
+          <span class="offer-timer-label">Orë</span>
+          <input type="number" id="offer_timer_hours" min="0" max="23" placeholder="0"/>
+        </div>
+        <div class="offer-timer-field">
+          <span class="offer-timer-label">Minuta</span>
+          <input type="number" id="offer_timer_minutes" min="0" max="59" placeholder="0"/>
+        </div>
+        <div class="offer-timer-field">
+          <span class="offer-timer-label">Sekonda</span>
+          <input type="number" id="offer_timer_seconds" min="0" max="59" placeholder="0"/>
+        </div>
+      </div>
+      <p class="offer-timer-note">Nëse vendosni një kohëzgjatje, oferta fshihet automatikisht pas skadimit.</p>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeOfferModal()">Anulo</button>
+      <button class="btn-save" onclick="saveOffer()">Ruaj Ofertën</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE CONFIRM MODAL ===== -->
+<div class="admin-modal-overlay" id="deleteModal">
+  <div class="admin-modal" style="max-width:400px;text-align:center;">
+    <div style="margin-bottom:18px;">
+      <svg width="52" height="52" fill="none" stroke="#C5302E" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <h3 style="margin-bottom:10px;">Konfirmo Fshirjen</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:24px;" id="deleteMsg">Jeni i sigurt që doni të fshini këtë element?</p>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Anulo</button>
+      <button class="btn-save" style="background:var(--accent);" id="confirmDeleteBtn">Fshi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="admin-toast" id="adminToast"></div>
+
+<!-- ===== FIREBASE + LOGIC ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc,
+  serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA65eOAfzHpOuxgGA9765kjn-U3-f0KJU8",
+  authDomain: "farmaciorien.firebaseapp.com",
+  projectId: "farmaciorien",
+  storageBucket: "farmaciorien.appspot.com",
+  messagingSenderId: "1051714146552",
+  appId: "1:1051714146552:web:b6ccda5711e41324e1ab0d"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+emailjs.init("gVNBZgU2BBiIjPLf6");
+
+// ============ AUTH ============
+const ADMIN_USER = "Kevin.Bega2003";
+const ADMIN_PASS = "enrakbega";
+let isLoggedIn = sessionStorage.getItem('fo_admin') === 'true';
+
+if (isLoggedIn) showAdmin();
+
+window.doLogin = function() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    sessionStorage.setItem('fo_admin','true');
+    document.getElementById('loginError').classList.remove('show');
+    showAdmin();
+  } else {
+    document.getElementById('loginError').classList.add('show');
+  }
+};
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key==='Enter') window.doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key==='Enter') window.doLogin(); });
+
+window.doLogout = function() {
+  sessionStorage.removeItem('fo_admin');
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+};
+
+function showAdmin() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  loadAll();
+}
+
+// ============ DATA ============
+let allOrders = [], allProducts = [], allOffers = [];
+let ordersPage = 1, productsPage = 1;
+const PER_PAGE = 10;
+let currentOrderFilter = 'all';
+let currentOrderSearch = '';
+
+async function loadAll() {
+  await Promise.all([loadOrders(), loadProducts(), loadOffers()]);
+  updateStats();
+}
+
+async function loadOrders() {
+  try {
+    const q = query(collection(db,'orders'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    allOrders = snap.docs.map(d => ({id:d.id,...d.data()}));
+    applyAndRenderOrders();
+  } catch(e) {
+    try {
+      const snap = await getDocs(collection(db,'orders'));
+      allOrders = snap.docs.map(d => ({id:d.id,...d.data()}));
+      applyAndRenderOrders();
+    } catch(e2) { console.error(e2); }
+  }
+}
+
+async function loadProducts() {
+  try {
+    const snap = await getDocs(collection(db,'sample'));
+    allProducts = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderProducts(allProducts);
+    renderDiscounts(allProducts);
+  } catch(e) { console.error(e); }
+}
+
+async function loadOffers() {
+  try {
+    const snap = await getDocs(collection(db,'offers'));
+    allOffers = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderOffersGrid(allOffers);
+  } catch(e) { console.error(e); }
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = allOrders.length;
+  document.getElementById('statPending').textContent = allOrders.filter(o => o.status==='pending').length;
+  document.getElementById('statComplete').textContent = allOrders.filter(o => o.status==='complete').length;
+  document.getElementById('statProducts').textContent = allProducts.length;
+}
+
+// ============ SECTION NAV ============
+window.showSection = function(name, btn) {
+  ['orders','inventory','offers'].forEach(s => document.getElementById('section-'+s).style.display = 'none');
+  document.getElementById('section-'+name).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const titles = {orders:'Porositë', inventory:'Inventari', offers:'Ofertat & Uljet'};
+  document.getElementById('topbarTitle').textContent = titles[name];
+
+  document.getElementById('topbarSearch').oninput = function() {
+    if (name==='orders') { currentOrderSearch = this.value; applyAndRenderOrders(); }
+    else if (name==='inventory') filterProducts(this.value);
+    else if (name==='offers') filterDiscounts(this.value);
+  };
+};
+
+// ============ ORDERS ============
+
+// Apply filter + search, then render
+function applyAndRenderOrders() {
+  let filtered = allOrders;
+
+  // Status filter
+  if (currentOrderFilter === 'pending') {
+    filtered = filtered.filter(o => o.status === 'pending');
+  } else if (currentOrderFilter === 'complete') {
+    filtered = filtered.filter(o => o.status === 'complete');
+  }
+
+  // Text search
+  if (currentOrderSearch.trim()) {
+    const lq = currentOrderSearch.toLowerCase();
+    filtered = filtered.filter(o =>
+      (o.buyerName||'').toLowerCase().includes(lq) ||
+      (o.buyerLastName||'').toLowerCase().includes(lq) ||
+      (o.buyerPhone||'').includes(lq) ||
+      (o.address||'').toLowerCase().includes(lq)
+    );
+  }
+
+  ordersPage = 1;
+  renderOrders(filtered);
+}
+
+window.setOrderFilter = function(filter, btn) {
+  currentOrderFilter = filter;
+  document.querySelectorAll('.order-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyAndRenderOrders();
+};
+
+function renderOrders(orders) {
+  const tbody = document.getElementById('ordersBody');
+  if (!orders.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">Nuk ka porosi</td></tr>';
+    document.getElementById('ordersPagination').innerHTML = '';
+    return;
+  }
+  const start = (ordersPage-1)*PER_PAGE, end = start+PER_PAGE;
+  const page = orders.slice(start,end);
+  tbody.innerHTML = page.map((o,i) => {
+    const notesCell = (o.notes && o.notes.trim())
+      ? `<td style="max-width:150px;font-size:0.8rem;color:var(--text-secondary);font-style:italic;">${o.notes}</td>`
+      : `<td style="font-size:0.8rem;color:var(--text-muted);">—</td>`;
+    return `
+    <tr>
+      <td>#${start+i+1}</td>
+      <td><strong>${o.buyerName||''} ${o.buyerLastName||''}</strong></td>
+      <td>${o.buyerPhone||''}</td>
+      <td style="max-width:140px;font-size:0.82rem;">${o.address||''}</td>
+      <td style="max-width:180px;font-size:0.8rem;white-space:pre-wrap;">${(o.items||'').substring(0,80)}${(o.items||'').length>80?'...':''}</td>
+      ${notesCell}
+      <td><strong>${o.total||''}</strong></td>
+      <td style="font-size:0.8rem;">${o.date||formatDate(o.createdAt)}</td>
+      <td>
+        <span class="badge-pill ${o.status==='complete'?'badge-complete':'badge-pending'}">
+          ${o.status==='complete'?'✓ Kryer':'⏳ Pritje'}
+        </span>
+      </td>
+      <td>
+        ${o.status!=='complete'
+          ? `<button class="action-btn success" onclick="markComplete('${o.id}')">✓ Kryej</button>`
+          : '<span style="font-size:0.8rem;color:var(--text-muted);">Kryer</span>'
+        }
+        <button class="action-btn danger" onclick="deleteOrder('${o.id}')">Fshi</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderPagination('ordersPagination', orders.length, ordersPage, (p)=>{ ordersPage=p; renderOrders(orders); });
+}
+
+function formatDate(ts) {
+  if (!ts) return '-';
+  if (ts.toDate) return ts.toDate().toLocaleString('sq-AL');
+  return '-';
+}
+
+window.markComplete = async function(id) {
+  try {
+    await updateDoc(doc(db,'orders',id), { status:'complete' });
+    const o = allOrders.find(x=>x.id===id);
+    if (o) o.status='complete';
+    applyAndRenderOrders();
+    updateStats();
+    showToast('Porosia u markua si e kryer!','success');
+  } catch(e) { showToast('Gabim!','error'); }
+};
+
+window.deleteOrder = function(id) {
+  openDeleteModal('Jeni i sigurt që doni të fshini këtë porosi?', async () => {
+    await deleteDoc(doc(db,'orders',id));
+    allOrders = allOrders.filter(x=>x.id!==id);
+    applyAndRenderOrders(); updateStats();
+    showToast('Porosia u fshi!','success');
+  });
+};
+
+window.filterOrders = function(q) {
+  currentOrderSearch = q;
+  applyAndRenderOrders();
+};
+
+// ============ PRODUCTS ============
+function renderProducts(prods) {
+  const tbody = document.getElementById('productsBody');
+  if (!prods.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);">Nuk ka produkte</td></tr>';
+    document.getElementById('productsPagination').innerHTML = '';
+    return;
+  }
+  const start = (productsPage-1)*PER_PAGE, end = start+PER_PAGE;
+  const page = prods.slice(start,end);
+  tbody.innerHTML = page.map(p => {
+    const base = parseFloat(p.price||p.cmimi||0);
+    const disc = parseFloat(p.discount||p.zbritje||0);
+    const final = disc>0 ? Math.round(base-(base*disc/100)) : base;
+    const cats = Array.isArray(p.category||p.kategoria)?(p.category||p.kategoria).join(', '):(p.category||p.kategoria||'-');
+    const isOOS = (p.status||p.statusi)==='out_of_stock';
+    return `
+    <tr>
+      <td><img class="product-thumb" src="${p.image||p.imazhi||'https://via.placeholder.com/44'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/44'"/></td>
+      <td><strong>${p.name||p.emri}</strong></td>
+      <td style="font-size:0.82rem;">${cats}</td>
+      <td>${base} Lek</td>
+      <td style="color:var(--accent);font-weight:700;">${disc>0?disc+'%':'-'}</td>
+      <td style="font-weight:700;">${disc>0?'<span style="color:var(--accent)">'+final+' Lek</span>':base+' Lek'}</td>
+      <td style="font-size:0.82rem;">${p.sasia||'-'}</td>
+      <td><span class="badge-pill ${isOOS?'badge-oos':'badge-available'}">${isOOS?'Jashtë Stokut':'E disponueshme'}</span></td>
+      <td>
+        <button class="action-btn" onclick="editProduct('${p.id}')">Ndrysho</button>
+        <button class="action-btn danger" onclick="deleteProduct('${p.id}')">Fshi</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderPagination('productsPagination', prods.length, productsPage, (pg)=>{ productsPage=pg; renderProducts(prods); });
+}
+
+window.filterProducts = function(q) {
+  const lq = q.toLowerCase();
+  const filtered = allProducts.filter(p =>
+    (p.name||p.emri||'').toLowerCase().includes(lq) ||
+    (p.description||p.pershkrimi||'').toLowerCase().includes(lq) ||
+    (Array.isArray(p.category||p.kategoria)?(p.category||p.kategoria).join(' '):(p.category||p.kategoria||'')).toLowerCase().includes(lq) ||
+    (Array.isArray(p.tags)?p.tags.join(' '):(p.tags||'')).toLowerCase().includes(lq)
+  );
+  productsPage=1; renderProducts(filtered);
+};
+
+window.openProductModal = function(p=null) {
+  document.getElementById('editProductId').value = p ? p.id : '';
+  document.getElementById('productModalTitle').textContent = p ? 'Ndrysho Produktin' : 'Shto Produkt të Ri';
+  document.getElementById('add_name').value = p ? (p.name||p.emri||'') : '';
+  document.getElementById('add_price').value = p ? (p.price||p.cmimi||'') : '';
+  document.getElementById('add_sasia').value = p ? (p.sasia||'') : '';
+  document.getElementById('add_status').value = p ? (p.status||p.statusi||'available') : 'available';
+  const cats = p ? (Array.isArray(p.category||p.kategoria)?(p.category||p.kategoria).join(', '):(p.category||p.kategoria||'')) : '';
+  document.getElementById('add_category').value = cats;
+  document.getElementById('add_image').value = p ? (p.image||p.imazhi||'') : '';
+  document.getElementById('add_pershkrimi').value = p ? (p.description||p.pershkrimi||'') : '';
+  const tags = p ? (Array.isArray(p.tags)?p.tags.join(', '):(p.tags||'')) : '';
+  document.getElementById('add_tags').value = tags;
+  document.getElementById('productModal').classList.add('open');
+};
+window.closeProductModal = function() { document.getElementById('productModal').classList.remove('open'); };
+
+window.editProduct = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  if (p) openProductModal(p);
+};
+
+window.saveProduct = async function() {
+  const name = document.getElementById('add_name').value.trim();
+  const price = document.getElementById('add_price').value.trim();
+  if (!name || !price) { showToast('Emri dhe çmimi janë të detyrueshme!','error'); return; }
+
+  const catsRaw = document.getElementById('add_category').value.trim();
+  const cats = catsRaw ? catsRaw.split(',').map(c=>c.trim()).filter(Boolean) : [];
+  const tagsRaw = document.getElementById('add_tags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+
+  const data = {
+    name: name,
+    price: parseFloat(price),
+    sasia: document.getElementById('add_sasia').value.trim(),
+    status: document.getElementById('add_status').value,
+    category: cats,
+    image: document.getElementById('add_image').value.trim(),
+    description: document.getElementById('add_pershkrimi').value.trim(),
+    tags: tags,
+    updatedAt: serverTimestamp()
+  };
+
+  const btn = document.getElementById('saveProductBtn');
+  btn.disabled=true; btn.textContent='Duke ruajtur...';
+
+  try {
+    const editId = document.getElementById('editProductId').value;
+    if (editId) {
+      await updateDoc(doc(db,'sample',editId), data);
+      const idx = allProducts.findIndex(x=>x.id===editId);
+      if (idx>-1) allProducts[idx] = {...allProducts[idx],...data, id:editId};
+      showToast('Produkti u ndryshua!','success');
+    } else {
+      data.createdAt = serverTimestamp();
+      const ref = await addDoc(collection(db,'sample'), data);
+      allProducts.push({...data, id:ref.id});
+      showToast('Produkti u shtua!','success');
+    }
+    closeProductModal();
+    renderProducts(allProducts);
+    renderDiscounts(allProducts);
+    updateStats();
+  } catch(e) {
+    console.error(e);
+    showToast('Gabim gjatë ruajtjes!','error');
+  }
+  btn.disabled=false; btn.textContent='Ruaj Produktin';
+};
+
+window.deleteProduct = function(id) {
+  openDeleteModal('Jeni i sigurt që doni të fshini këtë produkt?', async () => {
+    await deleteDoc(doc(db,'sample',id));
+    allProducts = allProducts.filter(x=>x.id!==id);
+    renderProducts(allProducts); renderDiscounts(allProducts); updateStats();
+    showToast('Produkti u fshi!','success');
+  });
+};
+
+// ============ DISCOUNTS ============
+function renderDiscounts(prods) {
+  const container = document.getElementById('discountList');
+  if (!prods.length) { container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:20px;">Nuk ka produkte</p>'; return; }
+  container.innerHTML = prods.map(p => {
+    const base = parseFloat(p.price||p.cmimi||0);
+    const disc = parseFloat(p.discount||p.zbritje||0);
+    const final = disc>0 ? Math.round(base-(base*disc/100)) : base;
+    return `
+    <div class="discount-item">
+      <img src="${p.image||p.imazhi||'https://via.placeholder.com/48'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/48'"/>
+      <div class="discount-info">
+        <div class="discount-name">${p.name||p.emri}</div>
+        <div class="discount-prices">${base} Lek ${disc>0?'→ <strong>'+final+' Lek</strong>':''}</div>
+      </div>
+      ${disc>0?`<span class="discount-pct">-${disc}%</span>`:''}
+      <input class="disc-input" type="number" min="0" max="99" value="${disc}" placeholder="%"/>
+      <button class="action-btn success" onclick="applyDiscount('${p.id}',this)">Apliko</button>
+    </div>`;
+  }).join('');
+}
+
+window.filterDiscounts = function(q) {
+  const lq = q.toLowerCase();
+  const filtered = allProducts.filter(p => (p.name||p.emri||'').toLowerCase().includes(lq));
+  renderDiscounts(filtered);
+};
+
+window.applyDiscount = async function(id, btn) {
+  const row = btn.closest('.discount-item');
+  const inp = row.querySelector('.disc-input');
+  const pct = parseFloat(inp.value) || 0;
+  btn.disabled=true; btn.textContent='...';
+  try {
+    await updateDoc(doc(db,'sample',id), { discount: pct, zbritje: pct });
+    const p = allProducts.find(x=>x.id===id);
+    if (p) { p.discount=pct; p.zbritje=pct; }
+    renderDiscounts(allProducts);
+    showToast(`Zbritja ${pct}% u aplikua!`,'success');
+  } catch(e) { showToast('Gabim!','error'); }
+  btn.disabled=false; btn.textContent='Apliko';
+};
+
+// ============ OFFERS ============
+function renderOffersGrid(offs) {
+  const grid = document.getElementById('offersGrid');
+  if (!offs.length) { grid.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:20px;">Nuk ka oferta</p>'; return; }
+  grid.innerHTML = offs.map(o => {
+    let timerHtml = '';
+    if (o.expiresAt) {
+      const exp = o.expiresAt.toDate ? o.expiresAt.toDate() : new Date(o.expiresAt);
+      const diff = exp.getTime() - Date.now();
+      if (diff <= 0) {
+        timerHtml = '<div style="font-size:0.75rem;color:var(--accent);font-weight:700;margin-top:6px;">⏰ Ka skaduar</div>';
+      } else {
+        const d = Math.floor(diff/86400000);
+        const h = Math.floor((diff%86400000)/3600000);
+        const m = Math.floor((diff%3600000)/60000);
+        timerHtml = `<div style="font-size:0.75rem;color:var(--warning);font-weight:600;margin-top:6px;">⏱ Skadon në: ${d>0?d+'d ':''} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}</div>`;
+      }
+    }
+    const discPct = parseFloat(o.discountPct||0);
+    const pids = Array.isArray(o.productIds) ? o.productIds : [];
+    return `
+    <div class="offer-card">
+      ${o.image||o.imazhi ? `<img class="offer-card-img" src="${o.image||o.imazhi}" alt="${o.title||o.titull}" onerror="this.style.display='none'"/>` : '<div class="offer-card-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--bg);">🎁</div>'}
+      <div class="offer-card-body">
+        <div class="offer-card-title">${o.title||o.titull||'Ofertë'}</div>
+        <div class="offer-card-desc">${(o.description||o.pershkrimi||'').substring(0,100)}</div>
+        ${discPct>0?`<div style="font-size:0.78rem;font-weight:700;color:var(--accent);margin-top:4px;">-${discPct}% zbritje</div>`:''}
+        ${pids.length>0?`<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">${pids.length} produkt${pids.length!==1?'e':''}</div>`:''}
+        ${timerHtml}
+        <div class="offer-card-actions" style="margin-top:12px;">
+          <button class="action-btn" onclick="editOffer('${o.id}')">Ndrysho</button>
+          <button class="action-btn danger" onclick="deleteOffer('${o.id}')">Fshi</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let offerSelectedProductIds = [];
+
+window.openOfferModal = function(o=null) {
+  offerSelectedProductIds = o && Array.isArray(o.productIds) ? [...o.productIds] : [];
+  document.getElementById('editOfferId').value = o ? o.id : '';
+  document.getElementById('offerModalTitle').textContent = o ? 'Ndrysho Ofertën' : 'Shto Ofertë të Re';
+  document.getElementById('offer_title').value = o ? (o.title||o.titull||'') : '';
+  document.getElementById('offer_desc').value = o ? (o.description||o.pershkrimi||'') : '';
+  document.getElementById('offer_tag').value = o ? (o.tag||'') : '';
+  document.getElementById('offer_image').value = o ? (o.image||o.imazhi||'') : '';
+  document.getElementById('offer_discount_pct').value = o ? (o.discountPct||'') : '';
+  document.getElementById('offerProductSearch').value = '';
+  document.getElementById('offerProductSearchResults').innerHTML = '';
+  document.getElementById('offerProductSearchResults').style.display = 'none';
+
+  document.getElementById('offer_timer_days').value = '';
+  document.getElementById('offer_timer_hours').value = '';
+  document.getElementById('offer_timer_minutes').value = '';
+  document.getElementById('offer_timer_seconds').value = '';
+  if (o && o.expiresAt) {
+    const exp = o.expiresAt.toDate ? o.expiresAt.toDate() : new Date(o.expiresAt);
+    const diff = exp.getTime() - Date.now();
+    if (diff > 0) {
+      document.getElementById('offer_timer_days').value = Math.floor(diff / 86400000);
+      document.getElementById('offer_timer_hours').value = Math.floor((diff % 86400000) / 3600000);
+      document.getElementById('offer_timer_minutes').value = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('offer_timer_seconds').value = Math.floor((diff % 60000) / 1000);
+    }
+  }
+
+  renderOfferSelectedProducts();
+  recalcOfferPrice();
+  document.getElementById('offerModal').classList.add('open');
+};
+
+window.closeOfferModal = function() {
+  document.getElementById('offerModal').classList.remove('open');
+};
+
+window.filterOfferProductSearch = function(q) {
+  const results = document.getElementById('offerProductSearchResults');
+  if (!q.trim()) { results.style.display = 'none'; results.innerHTML = ''; return; }
+  const lq = q.toLowerCase();
+  const matches = allProducts.filter(p =>
+    (p.name||p.emri||'').toLowerCase().includes(lq) && !offerSelectedProductIds.includes(p.id)
+  ).slice(0, 8);
+  if (!matches.length) {
+    results.innerHTML = '<div class="offer-search-no-result">Nuk u gjet asnjë produkt</div>';
+    results.style.display = 'block';
+    return;
+  }
+  results.innerHTML = matches.map(p => `
+    <div class="offer-search-result-item" onclick="addOfferProduct('${p.id}')">
+      <img src="${p.image||p.imazhi||'https://via.placeholder.com/32'}" onerror="this.src='https://via.placeholder.com/32'"/>
+      <div class="offer-search-result-info">
+        <div class="offer-search-result-name">${p.name||p.emri}</div>
+        <div class="offer-search-result-price">${parseFloat(p.price||p.cmimi||0)} Lek</div>
+      </div>
+    </div>`).join('');
+  results.style.display = 'block';
+};
+
+window.addOfferProduct = function(id) {
+  if (!offerSelectedProductIds.includes(id)) {
+    offerSelectedProductIds.push(id);
+    renderOfferSelectedProducts();
+    recalcOfferPrice();
+  }
+  document.getElementById('offerProductSearch').value = '';
+  document.getElementById('offerProductSearchResults').style.display = 'none';
+};
+
+window.removeOfferProduct = function(id) {
+  offerSelectedProductIds = offerSelectedProductIds.filter(x => x !== id);
+  renderOfferSelectedProducts();
+  recalcOfferPrice();
+};
+
+function renderOfferSelectedProducts() {
+  const container = document.getElementById('offerSelectedProducts');
+  if (!offerSelectedProductIds.length) {
+    container.innerHTML = '<span class="offer-no-selection">Asnjë produkt i zgjedhur</span>';
+    return;
+  }
+  container.innerHTML = offerSelectedProductIds.map(id => {
+    const p = allProducts.find(x => x.id === id);
+    if (!p) return '';
+    return `<div class="offer-selected-tag">
+      <span class="offer-selected-name">${p.name||p.emri}</span>
+      <span class="offer-selected-price">${parseFloat(p.price||p.cmimi||0)} L</span>
+      <button class="offer-selected-remove" onclick="removeOfferProduct('${id}')" title="Largo">✕</button>
+    </div>`;
+  }).join('');
+}
+
+window.recalcOfferPrice = function() {
+  const total = offerSelectedProductIds.reduce((s, id) => {
+    const p = allProducts.find(x => x.id === id);
+    return s + (p ? parseFloat(p.price||p.cmimi||0) : 0);
+  }, 0);
+  document.getElementById('offer_original_price').value = total > 0 ? `${Math.round(total)} Lekë` : '';
+  const discPct = parseFloat(document.getElementById('offer_discount_pct').value) || 0;
+  if (total > 0) {
+    const final = discPct > 0 ? Math.round(total * (1 - discPct/100)) : total;
+    document.getElementById('offer_final_price').value = `${final} Lekë`;
+  } else {
+    document.getElementById('offer_final_price').value = '';
+  }
+};
+
+window.saveOffer = async function() {
+  const title = document.getElementById('offer_title').value.trim();
+  if (!title) { showToast('Titulli është i detyrueshëm!','error'); return; }
+
+  const days    = parseInt(document.getElementById('offer_timer_days').value)    || 0;
+  const hours   = parseInt(document.getElementById('offer_timer_hours').value)   || 0;
+  const minutes = parseInt(document.getElementById('offer_timer_minutes').value) || 0;
+  const seconds = parseInt(document.getElementById('offer_timer_seconds').value) || 0;
+  const totalMs = (days*86400 + hours*3600 + minutes*60 + seconds) * 1000;
+  const expiresAt = totalMs > 0 ? new Date(Date.now() + totalMs) : null;
+
+  const discountPct = parseFloat(document.getElementById('offer_discount_pct').value) || 0;
+
+  const data = {
+    title, titull: title,
+    description: document.getElementById('offer_desc').value.trim(),
+    pershkrimi: document.getElementById('offer_desc').value.trim(),
+    tag: document.getElementById('offer_tag').value.trim(),
+    image: document.getElementById('offer_image').value.trim(),
+    imazhi: document.getElementById('offer_image').value.trim(),
+    productIds: offerSelectedProductIds,
+    discountPct,
+    expiresAt: expiresAt || null,
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    const editId = document.getElementById('editOfferId').value;
+    if (editId) {
+      await updateDoc(doc(db,'offers',editId), data);
+      const idx = allOffers.findIndex(x=>x.id===editId);
+      if (idx>-1) allOffers[idx]={...allOffers[idx],...data,id:editId};
+    } else {
+      data.createdAt = serverTimestamp();
+      const ref = await addDoc(collection(db,'offers'), data);
+      allOffers.push({...data,id:ref.id});
+    }
+    closeOfferModal();
+    renderOffersGrid(allOffers);
+    showToast('Oferta u ruajt!','success');
+  } catch(e) { console.error(e); showToast('Gabim!','error'); }
+};
+
+window.editOffer = function(id) {
+  const o = allOffers.find(x=>x.id===id);
+  if (o) openOfferModal(o);
+};
+
+window.deleteOffer = function(id) {
+  openDeleteModal('Jeni i sigurt që doni të fshini këtë ofertë?', async () => {
+    await deleteDoc(doc(db,'offers',id));
+    allOffers = allOffers.filter(x=>x.id!==id);
+    renderOffersGrid(allOffers);
+    showToast('Oferta u fshi!','success');
+  });
+};
+
+// ============ DELETE MODAL ============
+let _deleteCb = null;
+function openDeleteModal(msg, cb) {
+  _deleteCb = cb;
+  document.getElementById('deleteMsg').textContent = msg;
+  document.getElementById('deleteModal').classList.add('open');
+}
+window.closeDeleteModal = function() { document.getElementById('deleteModal').classList.remove('open'); _deleteCb=null; };
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (_deleteCb) { try { await _deleteCb(); } catch(e) { showToast('Gabim!','error'); } }
+  closeDeleteModal();
+});
+
+// ============ PAGINATION ============
+function renderPagination(containerId, total, currentPage, onPage) {
+  const pages = Math.ceil(total/PER_PAGE);
+  const el = document.getElementById(containerId);
+  if (pages<=1) { el.innerHTML=''; return; }
+  const info = `<span class="page-info">Faqja ${currentPage} / ${pages}</span>`;
+  const btns = Array.from({length:pages},(_,i)=>`<button class="page-btn ${i+1===currentPage?'active':''}" onclick="(${onPage})(${i+1})">${i+1}</button>`).join('');
+  el.innerHTML = info + btns;
+}
+
+// ============ TOAST ============
+function showToast(msg, type='') {
+  const t = document.getElementById('adminToast');
+  t.textContent = msg;
+  t.className = 'admin-toast show ' + type;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+window.showToast = showToast;
+</script>
+</body>
+</html>
