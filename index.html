@@ -312,6 +312,21 @@
     .phone-hint { font-size:0.77rem; color:var(--text-muted); margin-top:5px; background:rgba(47,79,115,0.06); border-radius:6px; padding:6px 10px; line-height:1.5; }
     .phone-hint strong { color:var(--primary); }
 
+    /* OTP STEP — SMS verification inside signup */
+    #signupOtpStep { display:none; }
+    .otp-info-box { background:rgba(47,79,115,0.07); border:1px solid rgba(47,79,115,0.15); border-radius:10px; padding:14px 16px; margin-bottom:16px; font-size:0.83rem; color:var(--text-secondary); line-height:1.6; }
+    .otp-info-box strong { color:var(--primary); }
+    .otp-input-wrap { position:relative; }
+    .otp-input-wrap input { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text-primary); font-size:1.3rem; font-weight:700; letter-spacing:6px; text-align:center; outline:none; transition:border 0.2s,box-shadow 0.2s; font-family:'Montserrat',sans-serif; }
+    .otp-input-wrap input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(47,79,115,0.12); background:var(--bg-card); }
+    .otp-resend-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+    .otp-resend-link { font-size:0.82rem; color:var(--primary); font-weight:600; cursor:pointer; background:none; border:none; padding:0; font-family:'Inter',sans-serif; text-decoration:underline; transition:color 0.2s; }
+    .otp-resend-link:hover { color:var(--primary-dark); }
+    .otp-resend-link:disabled { color:var(--text-muted); cursor:not-allowed; text-decoration:none; }
+    .otp-timer { font-size:0.8rem; color:var(--text-muted); }
+    .otp-back-link { font-size:0.82rem; color:var(--text-muted); cursor:pointer; background:none; border:none; padding:0; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:4px; transition:color 0.2s; margin-top:14px; }
+    .otp-back-link:hover { color:var(--text-primary); }
+
     /* SUCCESS POPUP & TOAST */
     .success-popup { position:fixed; bottom:28px; right:28px; background:var(--success); color:white; padding:16px 22px; border-radius:var(--radius-md); font-weight:700; font-size:0.95rem; box-shadow:var(--shadow-lg); z-index:2000; transform:translateX(120%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); display:flex; align-items:center; gap:10px; max-width:340px; }
     .success-popup.show { transform:translateX(0); }
@@ -416,6 +431,9 @@
   </style>
 </head>
 <body>
+
+<!-- Hidden reCAPTCHA container — must exist in DOM before Firebase Auth renders it -->
+<div id="recaptcha-container" style="display:none;"></div>
 
 <div id="cursor-glow"></div>
 
@@ -624,7 +642,7 @@
   <div class="cart-footer" id="cartFooter" style="display:none">
     <div class="cart-total">
       <span id="cartTotalLabel">Total:</span>
-      <span id="cartTotal">0 Lekë</span>
+      <span id="cartTotal">0 Lek</span>
     </div>
     <button class="checkout-btn" id="checkoutBtn">
       <span id="checkoutText">Porosit Tani</span>
@@ -707,7 +725,7 @@
     <div class="auth-global-error" id="authGlobalError"></div>
     <div class="auth-success-msg" id="authSuccessMsg"></div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN FORM — unchanged -->
     <div id="authLoginForm">
       <div class="auth-form-row">
         <div class="auth-form-group">
@@ -723,34 +741,63 @@
       </div>
       <div class="auth-form-group">
         <label>Nr. Telefoni *</label>
-        <input type="tel" id="loginPhone" placeholder="0694918535" autocomplete="tel"/>
+        <input type="tel" id="loginPhone" placeholder="06X XXX XXXX" autocomplete="tel"/>
         <div class="auth-error" id="errLoginPhone"></div>
-        <div class="phone-hint">Shkruaj numrin shqiptar pa +355 — p.sh. <strong>0694918535</strong></div>
+        <div class="phone-hint">Shkruaj numrin shqiptar pa +355 — p.sh. <strong>069 876 5432</strong></div>
       </div>
       <button class="auth-submit-btn" id="loginSubmitBtn" onclick="doLogin()">Hyr në llogari</button>
     </div>
 
-    <!-- SIGN UP FORM -->
+    <!-- SIGN UP FORM — Step 1: name/phone fields -->
     <div id="authSignupForm" style="display:none;">
-      <div class="auth-form-row">
-        <div class="auth-form-group">
-          <label>Emri *</label>
-          <input type="text" id="signupName" placeholder="Emri juaj" autocomplete="given-name"/>
-          <div class="auth-error" id="errSignupName"></div>
+
+      <!-- Step 1: user details -->
+      <div id="signupStep1">
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label>Emri *</label>
+            <input type="text" id="signupName" placeholder="Emri juaj" autocomplete="given-name"/>
+            <div class="auth-error" id="errSignupName"></div>
+          </div>
+          <div class="auth-form-group">
+            <label>Mbiemri *</label>
+            <input type="text" id="signupLastName" placeholder="Mbiemri juaj" autocomplete="family-name"/>
+            <div class="auth-error" id="errSignupLastName"></div>
+          </div>
         </div>
         <div class="auth-form-group">
-          <label>Mbiemri *</label>
-          <input type="text" id="signupLastName" placeholder="Mbiemri juaj" autocomplete="family-name"/>
-          <div class="auth-error" id="errSignupLastName"></div>
+          <label>Nr. Telefoni *</label>
+          <input type="tel" id="signupPhone" placeholder="06X XXX XXXX" autocomplete="tel"/>
+          <div class="auth-error" id="errSignupPhone"></div>
+          <div class="phone-hint">Shkruaj numrin shqiptar — p.sh. <strong>069 876 5432</strong> ose <strong>+355 69 876 5432</strong></div>
         </div>
+        <button class="auth-submit-btn" id="signupSubmitBtn" onclick="doSignup()">Krijo llogari</button>
       </div>
-      <div class="auth-form-group">
-        <label>Nr. Telefoni *</label>
-        <input type="tel" id="signupPhone" placeholder="0694918535" autocomplete="tel"/>
-        <div class="auth-error" id="errSignupPhone"></div>
-        <div class="phone-hint">Shkruaj numrin shqiptar — p.sh. <strong>0694918535</strong> ose <strong>+355694918535</strong></div>
+
+      <!-- Step 2: OTP verification -->
+      <div id="signupOtpStep">
+        <div class="otp-info-box">
+          📱 Kodi 6-shifror u dërgua te numri <strong id="otpPhoneDisplay"></strong>.<br/>
+          Shkruani kodin më poshtë për të verifikuar numrin tuaj.
+        </div>
+        <div class="auth-form-group">
+          <label>Shkruaj kodin 6-shifror *</label>
+          <div class="otp-input-wrap">
+            <input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code"/>
+          </div>
+          <div class="auth-error" id="errOtp"></div>
+        </div>
+        <div class="otp-resend-row">
+          <span class="otp-timer" id="otpTimerDisplay"></span>
+          <button class="otp-resend-link" id="otpResendBtn" onclick="resendOtp()" disabled>Ridërgo kodin</button>
+        </div>
+        <button class="auth-submit-btn" id="verifyOtpBtn" onclick="verifyOtp()">Verifiko</button>
+        <button class="otp-back-link" onclick="cancelOtp()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          Kthehu dhe ndrysho numrin
+        </button>
       </div>
-      <button class="auth-submit-btn" id="signupSubmitBtn" onclick="doSignup()">Krijo llogari</button>
+
     </div>
   </div>
 </div>
@@ -841,6 +888,9 @@ import {
   getFirestore, collection, getDocs, addDoc, serverTimestamp,
   doc, setDoc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth, signInWithPhoneNumber, RecaptchaVerifier
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey:            "AIzaSyA65eOAfzHpOuxgGA9765kjn-U3-f0KJU8",
@@ -851,42 +901,27 @@ const firebaseConfig = {
   appId:             "1:1051714146552:web:b6ccda5711e41324e1ab0d"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
 emailjs.init("gVNBZgU2BBiIjPLf6");
 
 // =====================================================================
 // PHONE HELPERS
 // =====================================================================
-/**
- * Normalise any Albanian phone input to the +355XXXXXXXXX format
- * that Firebase Auth / Firestore stores.
- *
- * Accepts:
- *   0694918535        → +355694918535
- *   +355694918535     → +355694918535
- *   355694918535      → +355694918535
- */
 function normalisePhone(raw) {
   const clean = raw.replace(/\s+/g, '').replace(/-/g, '');
   if (clean.startsWith('+355')) return clean;
   if (clean.startsWith('355'))  return '+' + clean;
-  if (clean.startsWith('06'))   return '+355' + clean.slice(1); // 06... → +3556...
-  if (clean.startsWith('6'))    return '+3556' + clean.slice(1); // 69...  → +35569...
-  return clean; // return as-is and let validation catch it
+  if (clean.startsWith('06'))   return '+355' + clean.slice(1);
+  if (clean.startsWith('6'))    return '+3556' + clean.slice(1);
+  return clean;
 }
 
-/**
- * Validate that the raw input looks like an Albanian mobile number.
- * Accepts 06XXXXXXXX (10 digits) or +355XXXXXXXXX (12 chars).
- */
 function isValidPhone(raw) {
   const clean = raw.replace(/\s+/g, '').replace(/-/g, '');
-  // local format: 06X XXXXXXX  (10 digits, starts with 06)
   if (/^06\d{8}$/.test(clean)) return true;
-  // international: +355 6X XXXXXXX
   if (/^\+3556\d{8}$/.test(clean)) return true;
-  // without +
   if (/^3556\d{8}$/.test(clean)) return true;
   return false;
 }
@@ -912,6 +947,196 @@ let slideCount      = 1;
 let offerTimerInterval = null;
 let _authFromOrderModal = false;
 let currentUserProfile = getSession();
+
+// =====================================================================
+// RECAPTCHA + PHONE AUTH STATE (signup only)
+// =====================================================================
+let recaptchaVerifier   = null;   // current RecaptchaVerifier instance
+let confirmationResult  = null;   // result from signInWithPhoneNumber()
+let otpResendTimer      = null;   // interval for the resend countdown
+let signupPendingData   = null;   // { name, lastName, phone } held across OTP step
+
+/**
+ * Destroy the existing RecaptchaVerifier so it can be re-rendered.
+ * Firebase throws "reCAPTCHA has already been rendered" if you try to
+ * create a second instance on the same DOM node without clearing it first.
+ */
+function clearRecaptcha() {
+  if (recaptchaVerifier) {
+    try { recaptchaVerifier.clear(); } catch (_) {}
+    recaptchaVerifier = null;
+  }
+  // Reset the container so Firebase can render a fresh instance
+  const container = document.getElementById('recaptcha-container');
+  if (container) container.innerHTML = '';
+}
+
+/**
+ * Create (or re-create) an invisible RecaptchaVerifier.
+ * Must be called just before signInWithPhoneNumber().
+ */
+function initRecaptcha() {
+  clearRecaptcha();
+  recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    size: 'invisible',
+    callback: () => {},           // auto-resolved for invisible reCAPTCHA
+    'expired-callback': () => {
+      clearRecaptcha();
+    }
+  });
+}
+
+// =====================================================================
+// OTP RESEND COUNTDOWN
+// =====================================================================
+function startOtpResendTimer(seconds = 60) {
+  const resendBtn   = document.getElementById('otpResendBtn');
+  const timerEl     = document.getElementById('otpTimerDisplay');
+  resendBtn.disabled = true;
+  clearInterval(otpResendTimer);
+  let remaining = seconds;
+  timerEl.textContent = `Ridërgoni pas ${remaining}s`;
+  otpResendTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(otpResendTimer);
+      timerEl.textContent = '';
+      resendBtn.disabled = false;
+    } else {
+      timerEl.textContent = `Ridërgoni pas ${remaining}s`;
+    }
+  }, 1000);
+}
+
+// =====================================================================
+// SHOW / HIDE OTP STEP
+// =====================================================================
+function showOtpStep(phoneForDisplay) {
+  document.getElementById('signupStep1').style.display    = 'none';
+  document.getElementById('signupOtpStep').style.display  = 'block';
+  document.getElementById('otpPhoneDisplay').textContent  = phoneForDisplay;
+  document.getElementById('otpInput').value               = '';
+  const errOtp = document.getElementById('errOtp');
+  errOtp.textContent = ''; errOtp.classList.remove('show');
+  document.getElementById('authGlobalError').classList.remove('show');
+  startOtpResendTimer(60);
+  setTimeout(() => document.getElementById('otpInput').focus(), 100);
+}
+
+function hideOtpStep() {
+  document.getElementById('signupStep1').style.display   = 'block';
+  document.getElementById('signupOtpStep').style.display = 'none';
+  clearInterval(otpResendTimer);
+  clearRecaptcha();
+  confirmationResult  = null;
+  signupPendingData   = null;
+}
+
+// =====================================================================
+// CANCEL OTP — go back to step 1
+// =====================================================================
+window.cancelOtp = function() {
+  hideOtpStep();
+  document.getElementById('authGlobalError').classList.remove('show');
+  document.getElementById('authSuccessMsg').classList.remove('show');
+};
+
+// =====================================================================
+// RESEND OTP
+// =====================================================================
+window.resendOtp = async function() {
+  if (!signupPendingData) return;
+  document.getElementById('authGlobalError').classList.remove('show');
+  const resendBtn = document.getElementById('otpResendBtn');
+  resendBtn.disabled = true;
+  try {
+    initRecaptcha();
+    confirmationResult = await signInWithPhoneNumber(auth, signupPendingData.phone, recaptchaVerifier);
+    document.getElementById('otpInput').value = '';
+    startOtpResendTimer(60);
+    showToast('Kodi u ridërgua ✓');
+  } catch (e) {
+    console.error('Resend OTP error:', e);
+    showAuthGlobalError('Gabim gjatë ridërgimit të kodit. Provoni sërish.');
+    resendBtn.disabled = false;
+    clearRecaptcha();
+  }
+};
+
+// =====================================================================
+// VERIFY OTP — confirm SMS code and finish signup
+// =====================================================================
+window.verifyOtp = async function() {
+  const code = document.getElementById('otpInput').value.trim();
+  const errOtp = document.getElementById('errOtp');
+  errOtp.classList.remove('show');
+  document.getElementById('authGlobalError').classList.remove('show');
+
+  if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+    errOtp.textContent = 'Shkruaj kodin 6-shifror të dërguar me SMS.';
+    errOtp.classList.add('show');
+    return;
+  }
+  if (!confirmationResult) {
+    showAuthGlobalError('Sesioni i verifikimit ka skaduar. Provoni sërish.');
+    hideOtpStep();
+    return;
+  }
+
+  const btn = document.getElementById('verifyOtpBtn');
+  btn.disabled = true; btn.textContent = 'Duke verifikuar...';
+
+  try {
+    // Confirm the SMS code with Firebase Auth
+    await confirmationResult.confirm(code);
+
+    // Phone verified — now write the user doc to Firestore
+    const { name, lastName, phone } = signupPendingData;
+    const newDocRef = await addDoc(collection(db, 'users'), {
+      name,
+      lastName,
+      phone,          // stored as +355XXXXXXXXX
+      createdAt: serverTimestamp()
+    });
+
+    currentUserProfile = { uid: newDocRef.id, name, lastName, phone };
+    setSession(currentUserProfile);
+    updateAuthUI();
+
+    clearInterval(otpResendTimer);
+    clearRecaptcha();
+    confirmationResult  = null;
+    signupPendingData   = null;
+
+    showAuthSuccess('Llogaria u krijua me sukses! 🎉');
+    setTimeout(() => {
+      closeAuthModal();
+      showToast(`Mirë se vjen, ${name}! 🎉`);
+      if (_authFromOrderModal) {
+        _authFromOrderModal = false;
+        document.getElementById('orderModal').classList.add('open');
+        updateOrderModalForAuthState();
+      }
+    }, 1200);
+
+  } catch (e) {
+    console.error('OTP verify error:', e);
+    let msg = 'Kodi është i gabuar ose ka skaduar. Kontrolloni dhe provoni sërish.';
+    if (e.code === 'auth/invalid-verification-code') {
+      msg = 'Kodi i verifikimit është i gabuar. Kontrolloni SMS-in dhe provoni sërish.';
+    } else if (e.code === 'auth/code-expired') {
+      msg = 'Kodi ka skaduar. Klikoni "Ridërgo kodin" për të marrë një kod të ri.';
+    }
+    showAuthGlobalError(msg);
+  }
+
+  btn.disabled = false; btn.textContent = 'Verifiko';
+};
+
+// Enter key in OTP input
+document.getElementById('otpInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.verifyOtp();
+});
 
 // =====================================================================
 // CURSOR GLOW
@@ -1059,13 +1284,26 @@ function openAuthModal(tab = 'login', fromOrder = false) {
   document.getElementById('authSuccessMsg').classList.remove('show');
   document.getElementById('authModal').classList.add('open');
 }
-function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+  // Clean up any in-progress OTP session when the modal closes
+  hideOtpStep();
+}
 
 window.switchAuthTab = function(tab) {
   document.getElementById('authLoginForm').style.display  = tab==='login'  ? 'block' : 'none';
   document.getElementById('authSignupForm').style.display = tab==='signup' ? 'block' : 'none';
   document.getElementById('tabLogin').classList.toggle('active',  tab==='login');
   document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  // Reset signup to step 1 when switching tabs
+  if (tab === 'signup') {
+    document.getElementById('signupStep1').style.display   = 'block';
+    document.getElementById('signupOtpStep').style.display = 'none';
+    clearRecaptcha();
+    confirmationResult = null;
+    signupPendingData  = null;
+    clearInterval(otpResendTimer);
+  }
   clearAuthErrors();
   document.getElementById('authGlobalError').classList.remove('show');
   document.getElementById('authSuccessMsg').classList.remove('show');
@@ -1078,7 +1316,7 @@ document.getElementById('gateLoginBtn').addEventListener('click',  () => { close
 document.getElementById('gateSignupBtn').addEventListener('click', () => { closeOrderModal(); openAuthModal('signup', true); });
 
 function clearAuthErrors() {
-  ['errLoginName','errLoginLastName','errLoginPhone','errSignupName','errSignupLastName','errSignupPhone'].forEach(id => {
+  ['errLoginName','errLoginLastName','errLoginPhone','errSignupName','errSignupLastName','errSignupPhone','errOtp'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.classList.remove('show'); el.textContent = ''; }
   });
@@ -1088,7 +1326,7 @@ function showAuthGlobalError(msg) { const el=document.getElementById('authGlobal
 function showAuthSuccess(msg)     { const el=document.getElementById('authSuccessMsg');  el.textContent=msg; el.classList.add('show'); }
 
 // =====================================================================
-// LOGIN — FIXED
+// LOGIN — UNCHANGED (no SMS on login)
 // Normalises phone to +355... format before looking up Firestore
 // =====================================================================
 window.doLogin = async function() {
@@ -1106,7 +1344,6 @@ window.doLogin = async function() {
   if (!rawPhone || !isValidPhone(rawPhone)) { showAuthError('errLoginPhone', t('errPhone')); valid = false; }
   if (!valid) return;
 
-  // Convert to +355 format for Firestore lookup
   const phone = normalisePhone(rawPhone);
 
   const btn = document.getElementById('loginSubmitBtn');
@@ -1118,7 +1355,6 @@ window.doLogin = async function() {
 
     snap.forEach(docSnap => {
       const d = docSnap.data();
-      // Normalise stored phone too, in case of inconsistencies
       const storedPhone = normalisePhone(d.phone || '');
       if (
         d.name?.toLowerCase()     === name.toLowerCase() &&
@@ -1155,8 +1391,8 @@ window.doLogin = async function() {
 };
 
 // =====================================================================
-// SIGN UP — FIXED
-// Normalises phone to +355... format before writing to Firestore
+// SIGN UP — Step 1: validate → check duplicate → send SMS OTP
+// Step 2 (verify) is handled by verifyOtp() above
 // =====================================================================
 window.doSignup = async function() {
   clearAuthErrors();
@@ -1173,14 +1409,13 @@ window.doSignup = async function() {
   if (!rawPhone || !isValidPhone(rawPhone)) { showAuthError('errSignupPhone', t('errPhone')); valid = false; }
   if (!valid) return;
 
-  // Normalise to +355 format — this is what will be stored
   const phone = normalisePhone(rawPhone);
 
   const btn = document.getElementById('signupSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Duke krijuar...';
+  btn.disabled = true; btn.textContent = 'Duke dërguar kodin...';
 
   try {
-    // Check if phone already registered (compare normalised)
+    // 1. Check Firestore: is this phone already registered?
     const snap = await getDocs(collection(db, 'users'));
     let alreadyExists = false;
     snap.forEach(docSnap => {
@@ -1193,38 +1428,32 @@ window.doSignup = async function() {
       return;
     }
 
-    // Write to Firestore — phone stored as +355XXXXXXXXX
-    const newDocRef = await addDoc(collection(db, 'users'), {
-      name,
-      lastName: last,
-      phone,          // stored as +355XXXXXXXXX
-      createdAt: serverTimestamp()
-    });
+    // 2. Phone is new — initialise reCAPTCHA and send SMS OTP
+    initRecaptcha();
+    confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
 
-    currentUserProfile = { uid: newDocRef.id, name, lastName: last, phone };
-    setSession(currentUserProfile);
-    updateAuthUI();
+    // 3. Hold user data until OTP is confirmed
+    signupPendingData = { name, lastName: last, phone };
 
-    showAuthSuccess('Llogaria u krijua me sukses! 🎉');
-    setTimeout(() => {
-      closeAuthModal();
-      showToast(`Mirë se vjen, ${name}! 🎉`);
-      if (_authFromOrderModal) {
-        _authFromOrderModal = false;
-        document.getElementById('orderModal').classList.add('open');
-        updateOrderModalForAuthState();
-      }
-    }, 1200);
+    // 4. Reveal the OTP step inside the same modal
+    showOtpStep(phone);
 
-  } catch(e) {
-    console.error('Signup error:', e);
-    showAuthGlobalError('Gabim gjatë regjistrimit. Kontrolloni lidhjen me internetin dhe provoni sërish.');
+  } catch (e) {
+    console.error('Signup / send OTP error:', e);
+    clearRecaptcha();
+    let msg = 'Gabim gjatë dërgimit të SMS. Kontrolloni numrin dhe provoni sërish.';
+    if (e.code === 'auth/invalid-phone-number') {
+      msg = 'Numri i telefonit nuk është i vlefshëm. Shkruajeni në formatin +355XXXXXXXXX.';
+    } else if (e.code === 'auth/too-many-requests') {
+      msg = 'Shumë kërkesa. Ju lutemi prisni disa minuta dhe provoni sërish.';
+    }
+    showAuthGlobalError(msg);
   }
 
   btn.disabled = false; btn.textContent = 'Krijo llogari';
 };
 
-// Enter key support
+// Enter key support for signup step 1
 document.getElementById('loginPhone').addEventListener('keydown',  e => { if(e.key==='Enter') window.doLogin(); });
 document.getElementById('signupPhone').addEventListener('keydown', e => { if(e.key==='Enter') window.doSignup(); });
 
@@ -1375,7 +1604,7 @@ function renderProducts(catFilter) {
         <div class="product-name">${p.name||p.emri}</div>
         ${cats?`<div class="product-cat">${cats}</div>`:''}
         <div class="product-pricing">
-          ${disc>0?`<span class="product-price-original">${base} Lekë</span><span class="product-price-discounted">${Math.round(eff)} Lekë</span>`:`<span class="product-price">${base} Lekë</span>`}
+          ${disc>0?`<span class="product-price-original">${base} Lek</span><span class="product-price-discounted">${Math.round(eff)} Lek</span>`:`<span class="product-price">${base} Lek</span>`}
         </div>
         <button class="add-to-cart-btn" ${isOOS?'disabled':''} onclick="event.stopPropagation(); addToCart('${p.id}')">
           ${isOOS?t('outOfStock'):t('addToCart')}
@@ -1402,12 +1631,12 @@ window.openProduct = function(id) {
   document.getElementById('detailDesc').textContent = p.description||p.pershkrimi||'';
   document.getElementById('detailSasia').textContent = p.sasia ? `${t('sasia')} ${p.sasia}` : '';
   if (disc>0) {
-    document.getElementById('detailPrice').textContent = `${Math.round(eff)} Lekë`;
+    document.getElementById('detailPrice').textContent = `${Math.round(eff)} Lek`;
     document.getElementById('detailPrice').classList.add('discounted');
-    document.getElementById('detailOriginal').textContent = `${base} Lekë`;
+    document.getElementById('detailOriginal').textContent = `${base} Lek`;
     document.getElementById('detailOriginal').style.display='';
   } else {
-    document.getElementById('detailPrice').textContent = `${base} Lekë`;
+    document.getElementById('detailPrice').textContent = `${base} Lek`;
     document.getElementById('detailPrice').classList.remove('discounted');
     document.getElementById('detailOriginal').style.display='none';
   }
@@ -1459,8 +1688,8 @@ window.openOffer = function(offerId) {
   const origEl    = document.getElementById('offerDetailOriginalPrice');
   const newEl     = document.getElementById('offerDetailNewPrice');
   const badgeEl   = document.getElementById('offerDetailDiscBadge');
-  if (discPct>0 && origTotal>0) { origEl.textContent=`${Math.round(origTotal)} Lekë`; origEl.style.display=''; newEl.textContent=`${newTotal} Lekë`; badgeEl.textContent=`-${discPct}%`; badgeEl.style.display=''; }
-  else if (origTotal>0) { origEl.style.display='none'; newEl.textContent=`${Math.round(origTotal)} Lekë`; badgeEl.style.display='none'; }
+  if (discPct>0 && origTotal>0) { origEl.textContent=`${Math.round(origTotal)} Lek`; origEl.style.display=''; newEl.textContent=`${newTotal} Lek`; badgeEl.textContent=`-${discPct}%`; badgeEl.style.display=''; }
+  else if (origTotal>0) { origEl.style.display='none'; newEl.textContent=`${Math.round(origTotal)} Lek`; badgeEl.style.display='none'; }
   else { origEl.style.display='none'; newEl.textContent=''; badgeEl.style.display='none'; }
   clearInterval(offerTimerInterval);
   const timerRow = document.getElementById('offerDetailTimerRow');
@@ -1496,7 +1725,7 @@ window.openOffer = function(offerId) {
       const isOOS=(p.status||p.statusi)==='out_of_stock';
       return `<div class="product-card" onclick="openProduct('${p.id}')">
         <div class="product-img-wrap"><img src="${p.image||p.imazhi||'https://via.placeholder.com/300x300?text=No+Image'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>${isOOS?`<div class="out-of-stock-overlay">${t('outOfStock')}</div>`:''}</div>
-        <div class="product-info"><div class="product-name">${p.name||p.emri}</div>${cats?`<div class="product-cat">${cats}</div>`:''}<div class="product-pricing"><span class="product-price">${base} Lekë</span></div>
+        <div class="product-info"><div class="product-name">${p.name||p.emri}</div>${cats?`<div class="product-cat">${cats}</div>`:''}<div class="product-pricing"><span class="product-price">${base} Lek</span></div>
         <button class="add-to-cart-btn" ${isOOS?'disabled':''} onclick="event.stopPropagation(); addToCart('${p.id}')">${isOOS?t('outOfStock'):t('addToCart')}</button></div></div>`;
     }).join('');
   document.getElementById('home-page').style.display    = 'none';
@@ -1546,12 +1775,12 @@ function renderCart() {
     total += item.price*item.qty;
     return `<div class="cart-item">
       <img class="cart-item-img" src="${item.image||'https://via.placeholder.com/54x54'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/54x54'"/>
-      <div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${Math.round(item.price)} Lekë × ${item.qty}</div></div>
+      <div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${Math.round(item.price)} Lek × ${item.qty}</div></div>
       <div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div>
       <span class="remove-btn" onclick="removeItem('${item.id}')" title="${t('remove')}">✕</span>
     </div>`;
   }).join('');
-  document.getElementById('cartTotal').textContent = `${Math.round(total)} Lekë`;
+  document.getElementById('cartTotal').textContent = `${Math.round(total)} Lek`;
 }
 window.changeQty  = function(id, delta) { const item=cart.find(i=>i.id===id); if(!item) return; item.qty+=delta; if(item.qty<=0) cart=cart.filter(i=>i.id!==id); saveCart(); updateCartBadge(); renderCart(); };
 window.removeItem = function(id) { cart=cart.filter(i=>i.id!==id); saveCart(); updateCartBadge(); renderCart(); };
@@ -1619,18 +1848,18 @@ document.getElementById('placeOrderBtn').addEventListener('click', async () => {
   const addr  = document.getElementById('locationSearch').value.trim();
   const notes = document.getElementById('orderNotes').value.trim();
   const total = cart.reduce((s,i) => s+i.price*i.qty, 0);
-  const items = cart.map(i=>`${i.name} x${i.qty} @ ${Math.round(i.price)} Lekë`).join('\n');
+  const items = cart.map(i=>`${i.name} x${i.qty} @ ${Math.round(i.price)} Lek`).join('\n');
   try {
     await addDoc(collection(db,'orders'), {
       buyerName:name, buyerLastName:last, buyerPhone:phone, address:addr,
-      notes, items, total:`${Math.round(total)} Lekë`,
+      notes, items, total:`${Math.round(total)} Lek`,
       date:new Date().toLocaleString('sq-AL'), status:'pending',
       userId: currentUserProfile.uid,
       createdAt:serverTimestamp()
     });
     await emailjs.send("service_zaexc1f","template_jw8fadu",{
       to_email:"farmaciorien@gmail.com", buyerName:name+' '+last,
-      buyerPhone:phone, address:addr, items, total:`${Math.round(total)} Lekë`,
+      buyerPhone:phone, address:addr, items, total:`${Math.round(total)} Lek`,
       notes:notes||'-', date:new Date().toLocaleString('sq-AL')
     });
     cart=[]; saveCart(); updateCartBadge(); renderCart();
@@ -1665,7 +1894,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
     const eff=getEffectivePrice(p);
     return `<div class="search-result-item" onclick="openProduct('${p.id}'); document.getElementById('searchDropdown').classList.remove('active'); document.getElementById('searchInput').value=''; document.getElementById('searchExpandWrap').classList.remove('open'); document.getElementById('searchToggleBtn').classList.remove('open');">
       <img class="search-result-img" src="${p.image||p.imazhi||'https://via.placeholder.com/42'}" alt="${p.name||p.emri}" onerror="this.src='https://via.placeholder.com/42'"/>
-      <div class="search-result-info"><div class="name">${p.name||p.emri}</div><div class="price">${Math.round(eff)} Lekë</div></div>
+      <div class="search-result-info"><div class="name">${p.name||p.emri}</div><div class="price">${Math.round(eff)} Lek</div></div>
     </div>`;
   }).join('');
   drop.classList.add('active');

@@ -49,6 +49,13 @@
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
           Inventari
         </button>
+        <button class="nav-item" onclick="showSection('users', this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Përdoruesit
+        </button>
         <button class="nav-item" onclick="showSection('offers', this)">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           Ofertat & Uljet
@@ -167,6 +174,46 @@
               </table>
             </div>
             <div class="pagination" id="productsPagination"></div>
+          </div>
+        </div>
+
+        <!-- USERS SECTION -->
+        <div id="section-users" style="display:none">
+          <div class="stats-grid" style="margin-bottom:24px;">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div class="stat-info"><div class="val" id="statUsers">0</div><div class="label">Përdorues të Regjistruar</div></div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Përdoruesit e Regjistruar</h3>
+              <div class="table-search">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="userSearch" placeholder="Kërko me emër ose telefon..." oninput="filterUsers(this.value)"/>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr>
+                  <th>#</th>
+                  <th>Emri</th>
+                  <th>Mbiemri</th>
+                  <th>Nr. Telefoni</th>
+                  <th>Data e Regjistrimit</th>
+                  <th>Veprime</th>
+                </tr></thead>
+                <tbody id="usersBody">
+                  <tr class="loading-row"><td colspan="6"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="usersPagination"></div>
           </div>
         </div>
 
@@ -369,6 +416,31 @@
 <div class="admin-toast" id="adminToast"></div>
 
 <!-- ===== FIREBASE + LOGIC ===== -->
+<!--
+  FIRESTORE SECURITY RULES (paste in Firebase Console > Firestore > Rules):
+
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId} {
+        allow read: if true;
+        allow create: if true;
+        allow update, delete: if true;
+      }
+      match /orders/{orderId} {
+        allow create: if true;
+        allow read: if true;
+        allow update, delete: if true;
+      }
+      match /sample/{productId} {
+        allow read, write: if true;
+      }
+      match /offers/{offerId} {
+        allow read, write: if true;
+      }
+    }
+  }
+-->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -424,14 +496,14 @@ function showAdmin() {
 }
 
 // ============ DATA ============
-let allOrders = [], allProducts = [], allOffers = [];
-let ordersPage = 1, productsPage = 1;
+let allOrders = [], allProducts = [], allOffers = [], allUsers = [];
+let ordersPage = 1, productsPage = 1, usersPage = 1;
 const PER_PAGE = 10;
 let currentOrderFilter = 'all';
 let currentOrderSearch = '';
 
 async function loadAll() {
-  await Promise.all([loadOrders(), loadProducts(), loadOffers()]);
+  await Promise.all([loadOrders(), loadProducts(), loadOffers(), loadUsers()]);
   updateStats();
 }
 
@@ -467,25 +539,35 @@ async function loadOffers() {
   } catch(e) { console.error(e); }
 }
 
+async function loadUsers() {
+  try {
+    const snap = await getDocs(collection(db,'users'));
+    allUsers = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderUsersTable(allUsers);
+  } catch(e) { console.error(e); }
+}
+
 function updateStats() {
   document.getElementById('statTotal').textContent = allOrders.length;
   document.getElementById('statPending').textContent = allOrders.filter(o => o.status==='pending').length;
   document.getElementById('statComplete').textContent = allOrders.filter(o => o.status==='complete').length;
   document.getElementById('statProducts').textContent = allProducts.length;
+  document.getElementById('statUsers').textContent = allUsers.length;
 }
 
 // ============ SECTION NAV ============
 window.showSection = function(name, btn) {
-  ['orders','inventory','offers'].forEach(s => document.getElementById('section-'+s).style.display = 'none');
+  ['orders','inventory','users','offers'].forEach(s => document.getElementById('section-'+s).style.display = 'none');
   document.getElementById('section-'+name).style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const titles = {orders:'Porositë', inventory:'Inventari', offers:'Ofertat & Uljet'};
+  const titles = {orders:'Porositë', inventory:'Inventari', users:'Përdoruesit', offers:'Ofertat & Uljet'};
   document.getElementById('topbarTitle').textContent = titles[name];
 
   document.getElementById('topbarSearch').oninput = function() {
     if (name==='orders') { currentOrderSearch = this.value; applyAndRenderOrders(); }
     else if (name==='inventory') filterProducts(this.value);
+    else if (name==='users') filterUsers(this.value);
     else if (name==='offers') filterDiscounts(this.value);
   };
 };
@@ -566,9 +648,9 @@ function renderOrders(orders) {
 }
 
 function formatDate(ts) {
-  if (!ts) return '-';
+  if (!ts) return '—';
   if (ts.toDate) return ts.toDate().toLocaleString('sq-AL');
-  return '-';
+  return '—';
 }
 
 window.markComplete = async function(id) {
@@ -719,6 +801,51 @@ window.deleteProduct = function(id) {
     allProducts = allProducts.filter(x=>x.id!==id);
     renderProducts(allProducts); renderDiscounts(allProducts); updateStats();
     showToast('Produkti u fshi!','success');
+  });
+};
+
+// ============ USERS ============
+function renderUsersTable(users) {
+  const tbody = document.getElementById('usersBody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">Nuk ka përdorues të regjistruar</td></tr>';
+    document.getElementById('usersPagination').innerHTML = '';
+    return;
+  }
+  const start = (usersPage-1)*PER_PAGE, end = start+PER_PAGE;
+  const page = users.slice(start, end);
+  tbody.innerHTML = page.map((u, i) => `
+    <tr>
+      <td>#${start+i+1}</td>
+      <td><strong>${u.name||'—'}</strong></td>
+      <td>${u.lastName||'—'}</td>
+      <td>${u.phone||'—'}</td>
+      <td style="font-size:0.82rem;">${formatDate(u.createdAt)}</td>
+      <td>
+        <button class="action-btn danger" onclick="deleteUser('${u.id}')">Fshi</button>
+      </td>
+    </tr>`).join('');
+  renderPagination('usersPagination', users.length, usersPage, (pg)=>{ usersPage=pg; renderUsersTable(users); });
+}
+
+window.filterUsers = function(q) {
+  const lq = q.toLowerCase();
+  const filtered = allUsers.filter(u =>
+    (u.name||'').toLowerCase().includes(lq) ||
+    (u.lastName||'').toLowerCase().includes(lq) ||
+    (u.phone||'').includes(lq)
+  );
+  usersPage = 1;
+  renderUsersTable(filtered);
+};
+
+window.deleteUser = function(id) {
+  openDeleteModal('Jeni i sigurt që doni të fshini këtë përdorues?', async () => {
+    await deleteDoc(doc(db,'users',id));
+    allUsers = allUsers.filter(x=>x.id!==id);
+    renderUsersTable(allUsers);
+    updateStats();
+    showToast('Përdoruesi u fshi!','success');
   });
 };
 
@@ -903,11 +1030,11 @@ window.recalcOfferPrice = function() {
     const p = allProducts.find(x => x.id === id);
     return s + (p ? parseFloat(p.price||p.cmimi||0) : 0);
   }, 0);
-  document.getElementById('offer_original_price').value = total > 0 ? `${Math.round(total)} Lekë` : '';
+  document.getElementById('offer_original_price').value = total > 0 ? `${Math.round(total)} Lek` : '';
   const discPct = parseFloat(document.getElementById('offer_discount_pct').value) || 0;
   if (total > 0) {
     const final = discPct > 0 ? Math.round(total * (1 - discPct/100)) : total;
-    document.getElementById('offer_final_price').value = `${final} Lekë`;
+    document.getElementById('offer_final_price').value = `${final} Lek`;
   } else {
     document.getElementById('offer_final_price').value = '';
   }
@@ -977,6 +1104,7 @@ function openDeleteModal(msg, cb) {
   document.getElementById('deleteMsg').textContent = msg;
   document.getElementById('deleteModal').classList.add('open');
 }
+window.openDeleteModal = openDeleteModal;
 window.closeDeleteModal = function() { document.getElementById('deleteModal').classList.remove('open'); _deleteCb=null; };
 document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
   if (_deleteCb) { try { await _deleteCb(); } catch(e) { showToast('Gabim!','error'); } }
